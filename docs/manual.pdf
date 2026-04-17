@@ -1,0 +1,198 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 2560 >>
+stream
+BT /F2 22 Tf 1 0 0 1 54 774 Tm (Qiskit KG Encodings) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 726 Tm (Small User Manual) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 697 Tm (This repository implements a reusable Python pipeline for encoding RDF) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 682 Tm (Knowledge Graphs into quantum states with Qiskit.) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 657 Tm (It supports three encoding families:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 632 Tm (- basis encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 615 Tm (- amplitude encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 598 Tm (- phase encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 575 Tm (The default dataset is included in data/running_example.ttl, but the code is) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 560 Tm (designed so you can later replace that file with another Turtle graph and run) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 545 Tm (the same pipeline again.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 512 Tm (What The Project Does) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 483 Tm (The workflow is:) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 458 Tm (1. load an RDF graph from a file) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 439 Tm (2. parse the triples) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 420 Tm (3. build deterministic ID mappings) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 401 Tm (4. create an encoding-specific representation) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 382 Tm (5. build a Qiskit circuit) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 363 Tm (6. simulate locally with Aer) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 344 Tm (7. save logs and figures) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 319 Tm (The code is split into reusable modules under src/:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 294 Tm (- `kg_parser.py`: RDF loading and triple extraction) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 277 Tm (- `id_mapper.py`: entity/object and predicate indexing) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 260 Tm (- `basis_encoding.py`: basis-state encoding of triples) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 243 Tm (- `amplitude_encoding.py`: amplitude vectors over triple indices) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 226 Tm (- `phase_encoding.py`: phase-marking rules over triple indices) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 209 Tm (- `visualization.py`: JSON logs and bar-chart figures) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 192 Tm (- `main.py`: command-line entry point) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 161 Tm (Default Dataset) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 132 Tm (The included example graph contains six triples:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 107 Tm (- Aristotle is typed as Person) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 90 Tm (- Person is a subclass of Mortal) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 73 Tm (- Aristotle lives at Athens) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 6 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+8 0 obj
+<< /Length 2774 >>
+stream
+BT /F1 11 Tf 1 0 0 1 68 778 Tm (- Athens is typed as City) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 761 Tm (- City is a subclass of Place) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 744 Tm (- Aristotle teaches Philosophy) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 721 Tm (This dataset is only a demo target for the thesis repository. The) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 706 Tm (implementation itself is not hardcoded only for these six triples.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 673 Tm (Basis Encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 644 Tm (For basis encoding, each triple \(s, p, o\) is converted into a computational) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 629 Tm (basis state:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 604 Tm (subject_bits || predicate_bits || object_bits) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 582 Tm (Important details:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 557 Tm (- subject and object share the same ID space) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 540 Tm (- predicates use a separate ID space) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 523 Tm (- bit widths are computed dynamically from the loaded graph) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 506 Tm (- the displayed bitstring is kept explicit so the Qiskit endianness is) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 491 Tm (  easier to interpret) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 468 Tm (The framework can also build a small uniform superposition over the encoded) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 453 Tm (triple states for demonstration purposes.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 420 Tm (Amplitude Encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 391 Tm (Amplitude encoding is defined over triple indices:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 366 Tm (- `|i>` corresponds to the `i`-th triple in the current graph context) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 349 Tm (- the vector is padded automatically to the next power of two) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 332 Tm (- the state is normalized automatically) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 309 Tm (If no custom weights are provided, the project uses a default strategy such as) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 294 Tm (uniform weights.) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 269 Tm (For the running example, the experiment script uses the thesis demo vector:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 244 Tm ([2, 1, 3, 1, 1, 2]) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 222 Tm (which is padded automatically to length 8 before state preparation.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 189 Tm (Phase Encoding) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 160 Tm (Phase encoding is also defined over triple indices.) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 135 Tm (The pipeline:) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 110 Tm (1. creates a uniform superposition over the valid triple indices) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 91 Tm (2. applies a phase shift to marked states) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 72 Tm (3. applies a Hadamard mixing step to create interference) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 8 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+10 0 obj
+<< /Length 2598 >>
+stream
+BT /F1 11 Tf 1 0 0 1 54 768 Tm (The marking rule is reusable. It is not hardcoded only for Aristotle.) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 743 Tm (Examples:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 718 Tm (- mark triples by predicate URI) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 701 Tm (- mark triples by subject URI) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 684 Tm (- mark triples with a custom condition function) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 661 Tm (For the included running example, the default demo rule marks triples with) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 646 Tm (predicate http://example.org/teaches.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 613 Tm (Command-Line Usage) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 584 Tm (Run the project with:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 559 Tm (python -m src.main --encoding basis --input data/running_example.ttl) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 537 Tm (python -m src.main --encoding amplitude --input data/running_example.ttl) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 515 Tm (python -m src.main --encoding phase --input data/running_example.ttl) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 493 Tm (Useful optional flags:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 468 Tm (- `--fixed-thesis-mapping`) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 451 Tm (- `--weights 2,1,3,1,1,2`) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 434 Tm (- `--mark-predicate http://example.org/teaches`) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 417 Tm (- `--mark-subject http://example.org/Aristotle`) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 386 Tm (Running The Included Experiments) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 357 Tm (You can also run the thin wrappers in experiments/:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 332 Tm (- `python experiments/exp_basis_running_example.py`) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 315 Tm (- `python experiments/exp_amplitude_running_example.py`) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 298 Tm (- `python experiments/exp_phase_running_example.py`) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 275 Tm (These wrappers call the reusable code in src/ and simply provide default) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 260 Tm (settings for the included thesis example.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 227 Tm (Using Another Turtle File) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 198 Tm (To run the same pipeline on another knowledge graph:) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 173 Tm (1. prepare another RDF file in Turtle format) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 154 Tm (2. point the CLI to that file with --input) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 135 Tm (3. optionally pass custom weights or a phase-marking rule) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 110 Tm (Example:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 85 Tm (python -m src.main --encoding basis --input path/to/another_graph.ttl) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 10 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+12 0 obj
+<< /Length 2450 >>
+stream
+BT /F1 11 Tf 1 0 0 1 54 778 Tm (The project will automatically rebuild the mappings and required bit widths) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 763 Tm (from the new graph.) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 730 Tm (Outputs) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 701 Tm (The pipeline writes outputs under results/:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 676 Tm (- `results/logs/` contains JSON logs) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 659 Tm (- `results/figures/` contains plots) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 636 Tm (The exact outputs depend on the chosen encoding:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 611 Tm (- basis: per-triple basis states and an optional superposition summary) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 594 Tm (- amplitude: vector details and basis-state probabilities) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 577 Tm (- phase: probabilities before and after the mixing step) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 554 Tm (The JSON log files also include runtime instrumentation. This means each run) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 539 Tm (records:) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 514 Tm (- RDF loading and parsing time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 497 Tm (- context/mapping construction time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 480 Tm (- state preparation time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 463 Tm (- statevector simulation time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 446 Tm (- measurement simulation time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 429 Tm (- plotting time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 412 Tm (- log-writing time) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 395 Tm (- total runtime of the full program) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 364 Tm (Notes And Limitations) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 335 Tm (- the current input format is Turtle first) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 318 Tm (- the code is structured so more RDF serializations can be added later) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 301 Tm (- the phase oracle uses a simple dense diagonal unitary, which is fine for) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 286 Tm (  a small thesis demo but not meant for large-scale graphs) Tj ET
+BT /F1 11 Tf 1 0 0 1 68 269 Tm (- only local simulation is required; IBM cloud access is not needed) Tj ET
+BT /F2 15 Tf 1 0 0 1 54 238 Tm (Regenerating This PDF) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 209 Tm (The source for this document is:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 184 Tm (docs/manual.md) Tj ET
+BT /F1 11 Tf 1 0 0 1 54 162 Tm (The PDF can be regenerated with:) Tj ET
+BT /F3 10 Tf 1 0 0 1 64 137 Tm (python3 tools/generate_pdf_manual.py) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 12 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> >>
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000141 00000 n 
+0000000211 00000 n 
+0000000286 00000 n 
+0000000354 00000 n 
+0000002966 00000 n 
+0000003112 00000 n 
+0000005938 00000 n 
+0000006084 00000 n 
+0000008735 00000 n 
+0000008883 00000 n 
+0000011386 00000 n 
+trailer
+<< /Size 14 /Root 1 0 R >>
+startxref
+11534
+%%EOF

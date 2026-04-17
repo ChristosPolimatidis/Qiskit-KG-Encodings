@@ -1,0 +1,267 @@
+{
+  "encoding": "phase",
+  "context": {
+    "dataset_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/data/running_example.ttl",
+    "fixed_thesis_mapping": false,
+    "triple_count": 6,
+    "entity_count": 7,
+    "predicate_count": 4,
+    "entity_bit_width": 3,
+    "predicate_bit_width": 2,
+    "triples": [
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/livesAt",
+        "object": "http://example.org/Athens"
+      },
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/teaches",
+        "object": "http://example.org/Philosophy"
+      },
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/Person"
+      },
+      {
+        "subject": "http://example.org/Athens",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/City"
+      },
+      {
+        "subject": "http://example.org/City",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Place"
+      },
+      {
+        "subject": "http://example.org/Person",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Mortal"
+      }
+    ],
+    "entity_to_id": {
+      "http://example.org/Aristotle": 0,
+      "http://example.org/Athens": 1,
+      "http://example.org/City": 2,
+      "http://example.org/Mortal": 3,
+      "http://example.org/Person": 4,
+      "http://example.org/Philosophy": 5,
+      "http://example.org/Place": 6
+    },
+    "predicate_to_id": {
+      "http://example.org/livesAt": 0,
+      "http://example.org/teaches": 1,
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": 2,
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": 3
+    }
+  },
+  "phase_angle": 3.141592653589793,
+  "marked_triples": [
+    {
+      "triple_index": 1,
+      "basis_state": "001",
+      "phase_value": 3.141592653589793,
+      "triple": {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/teaches",
+        "object": "http://example.org/Philosophy"
+      }
+    }
+  ],
+  "phase_angles": [
+    0.0,
+    3.141592653589793,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "initial_uniform_state": [
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.4082482904638631,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ]
+  ],
+  "before_mixing": {
+    "ideal_probabilities": {
+      "000": 0.1666666666666667,
+      "001": 0.1666666666666667,
+      "010": 0.1666666666666667,
+      "011": 0.1666666666666667,
+      "100": 0.1666666666666667,
+      "101": 0.1666666666666667
+    },
+    "counts": {
+      "000": 350,
+      "001": 362,
+      "010": 306,
+      "011": 366,
+      "100": 343,
+      "101": 321
+    },
+    "empirical_probabilities": {
+      "000": 0.1708984375,
+      "001": 0.1767578125,
+      "010": 0.1494140625,
+      "011": 0.1787109375,
+      "100": 0.16748046875,
+      "101": 0.15673828125
+    }
+  },
+  "after_mixing": {
+    "ideal_probabilities": {
+      "000": 0.3333333333333333,
+      "001": 0.08333333333333333,
+      "010": 3.8060204764604725e-34,
+      "011": 0.08333333333333333,
+      "100": 4.378626592867524e-33,
+      "101": 0.08333333333333333,
+      "110": 0.3333333333333333,
+      "111": 0.08333333333333333
+    },
+    "counts": {
+      "000": 672,
+      "001": 181,
+      "011": 166,
+      "101": 171,
+      "110": 692,
+      "111": 166
+    },
+    "empirical_probabilities": {
+      "000": 0.328125,
+      "001": 0.08837890625,
+      "011": 0.0810546875,
+      "101": 0.08349609375,
+      "110": 0.337890625,
+      "111": 0.0810546875
+    }
+  },
+  "timings": {
+    "encoding_pipeline": {
+      "mark_rule_selection": {
+        "seconds": 3e-06,
+        "milliseconds": 0.003
+      },
+      "phase_marked_state_preparation": {
+        "seconds": 0.001254,
+        "milliseconds": 1.254
+      },
+      "interference_circuit_preparation": {
+        "seconds": 0.000111,
+        "milliseconds": 0.111
+      },
+      "before_mixing": {
+        "ideal_statevector_simulation": {
+          "seconds": 0.00314,
+          "milliseconds": 3.14
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000195,
+          "milliseconds": 0.195
+        },
+        "measurement_simulation": {
+          "seconds": 0.222401,
+          "milliseconds": 222.401
+        }
+      },
+      "after_mixing": {
+        "ideal_statevector_simulation": {
+          "seconds": 0.000992,
+          "milliseconds": 0.992
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000244,
+          "milliseconds": 0.244
+        },
+        "measurement_simulation": {
+          "seconds": 0.168056,
+          "milliseconds": 168.056
+        }
+      },
+      "plot_generation": {
+        "before_mixing_plot": {
+          "seconds": 0.336749,
+          "milliseconds": 336.749
+        },
+        "after_mixing_plot": {
+          "seconds": 0.24828,
+          "milliseconds": 248.28
+        },
+        "total": {
+          "seconds": 0.585028,
+          "milliseconds": 585.028
+        }
+      },
+      "pipeline_total": {
+        "seconds": 0.981491,
+        "milliseconds": 981.491
+      }
+    },
+    "setup": {
+      "load_rdf_and_parse_triples": {
+        "seconds": 0.004941,
+        "milliseconds": 4.941
+      },
+      "build_id_mappings_and_context": {
+        "seconds": 0.000166,
+        "milliseconds": 0.166
+      },
+      "prepare_results_directories": {
+        "seconds": 6.5e-05,
+        "milliseconds": 0.065
+      }
+    },
+    "output": {
+      "json_log_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/results/logs/running_example_phase.json",
+      "json_log_write": {
+        "seconds": 0.000787,
+        "milliseconds": 0.787
+      }
+    },
+    "program": {
+      "run_started_at_utc": "2026-04-17T13:40:27+00:00",
+      "selected_encoding": "phase",
+      "encoding_dispatch_total": {
+        "seconds": 0.981566,
+        "milliseconds": 981.566
+      },
+      "total_runtime": {
+        "seconds": 0.989164,
+        "milliseconds": 989.164
+      },
+      "run_finished_at_utc": "2026-04-17T13:40:28+00:00",
+      "timing_note": "json_log_write was measured on a first write pass so it could be embedded in the final JSON log."
+    }
+  }
+}

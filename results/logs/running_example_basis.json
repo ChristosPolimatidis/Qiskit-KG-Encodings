@@ -1,0 +1,545 @@
+{
+  "encoding": "basis",
+  "context": {
+    "dataset_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/data/running_example.ttl",
+    "fixed_thesis_mapping": false,
+    "triple_count": 6,
+    "entity_count": 7,
+    "predicate_count": 4,
+    "entity_bit_width": 3,
+    "predicate_bit_width": 2,
+    "triples": [
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/livesAt",
+        "object": "http://example.org/Athens"
+      },
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/teaches",
+        "object": "http://example.org/Philosophy"
+      },
+      {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/Person"
+      },
+      {
+        "subject": "http://example.org/Athens",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/City"
+      },
+      {
+        "subject": "http://example.org/City",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Place"
+      },
+      {
+        "subject": "http://example.org/Person",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Mortal"
+      }
+    ],
+    "entity_to_id": {
+      "http://example.org/Aristotle": 0,
+      "http://example.org/Athens": 1,
+      "http://example.org/City": 2,
+      "http://example.org/Mortal": 3,
+      "http://example.org/Person": 4,
+      "http://example.org/Philosophy": 5,
+      "http://example.org/Place": 6
+    },
+    "predicate_to_id": {
+      "http://example.org/livesAt": 0,
+      "http://example.org/teaches": 1,
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": 2,
+      "http://www.w3.org/2000/01/rdf-schema#subClassOf": 3
+    }
+  },
+  "triple_runs": [
+    {
+      "triple_index": 0,
+      "triple": {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/livesAt",
+        "object": "http://example.org/Athens"
+      },
+      "subject_id": 0,
+      "predicate_id": 0,
+      "object_id": 1,
+      "subject_bits": "000",
+      "predicate_bits": "00",
+      "object_bits": "001",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "00000001",
+      "ideal_probabilities": {
+        "00000001": 1.0
+      },
+      "counts": {
+        "00000001": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.000105,
+          "milliseconds": 0.105
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.002559,
+          "milliseconds": 2.559
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000264,
+          "milliseconds": 0.264
+        },
+        "measurement_simulation": {
+          "seconds": 0.190138,
+          "milliseconds": 190.138
+        },
+        "triple_total": {
+          "seconds": 0.193074,
+          "milliseconds": 193.074
+        }
+      }
+    },
+    {
+      "triple_index": 1,
+      "triple": {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://example.org/teaches",
+        "object": "http://example.org/Philosophy"
+      },
+      "subject_id": 0,
+      "predicate_id": 1,
+      "object_id": 5,
+      "subject_bits": "000",
+      "predicate_bits": "01",
+      "object_bits": "101",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "00001101",
+      "ideal_probabilities": {
+        "00001101": 1.0
+      },
+      "counts": {
+        "00001101": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.00016,
+          "milliseconds": 0.16
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.000594,
+          "milliseconds": 0.594
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000274,
+          "milliseconds": 0.274
+        },
+        "measurement_simulation": {
+          "seconds": 0.235878,
+          "milliseconds": 235.878
+        },
+        "triple_total": {
+          "seconds": 0.236915,
+          "milliseconds": 236.915
+        }
+      }
+    },
+    {
+      "triple_index": 2,
+      "triple": {
+        "subject": "http://example.org/Aristotle",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/Person"
+      },
+      "subject_id": 0,
+      "predicate_id": 2,
+      "object_id": 4,
+      "subject_bits": "000",
+      "predicate_bits": "10",
+      "object_bits": "100",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "00010100",
+      "ideal_probabilities": {
+        "00010100": 1.0
+      },
+      "counts": {
+        "00010100": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.000208,
+          "milliseconds": 0.208
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.000533,
+          "milliseconds": 0.533
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000151,
+          "milliseconds": 0.151
+        },
+        "measurement_simulation": {
+          "seconds": 0.177066,
+          "milliseconds": 177.066
+        },
+        "triple_total": {
+          "seconds": 0.177965,
+          "milliseconds": 177.965
+        }
+      }
+    },
+    {
+      "triple_index": 3,
+      "triple": {
+        "subject": "http://example.org/Athens",
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "object": "http://example.org/City"
+      },
+      "subject_id": 1,
+      "predicate_id": 2,
+      "object_id": 2,
+      "subject_bits": "001",
+      "predicate_bits": "10",
+      "object_bits": "010",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "00110010",
+      "ideal_probabilities": {
+        "00110010": 1.0
+      },
+      "counts": {
+        "00110010": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.000205,
+          "milliseconds": 0.205
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.000559,
+          "milliseconds": 0.559
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000157,
+          "milliseconds": 0.157
+        },
+        "measurement_simulation": {
+          "seconds": 0.161438,
+          "milliseconds": 161.438
+        },
+        "triple_total": {
+          "seconds": 0.162366,
+          "milliseconds": 162.366
+        }
+      }
+    },
+    {
+      "triple_index": 4,
+      "triple": {
+        "subject": "http://example.org/City",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Place"
+      },
+      "subject_id": 2,
+      "predicate_id": 3,
+      "object_id": 6,
+      "subject_bits": "010",
+      "predicate_bits": "11",
+      "object_bits": "110",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "01011110",
+      "ideal_probabilities": {
+        "01011110": 1.0
+      },
+      "counts": {
+        "01011110": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.000215,
+          "milliseconds": 0.215
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.000655,
+          "milliseconds": 0.655
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000161,
+          "milliseconds": 0.161
+        },
+        "measurement_simulation": {
+          "seconds": 0.222338,
+          "milliseconds": 222.338
+        },
+        "triple_total": {
+          "seconds": 0.223376,
+          "milliseconds": 223.376
+        }
+      }
+    },
+    {
+      "triple_index": 5,
+      "triple": {
+        "subject": "http://example.org/Person",
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "object": "http://example.org/Mortal"
+      },
+      "subject_id": 4,
+      "predicate_id": 3,
+      "object_id": 3,
+      "subject_bits": "100",
+      "predicate_bits": "11",
+      "object_bits": "011",
+      "register_order": [
+        "subject",
+        "predicate",
+        "object"
+      ],
+      "bitstring": "10011011",
+      "ideal_probabilities": {
+        "10011011": 1.0
+      },
+      "counts": {
+        "10011011": 2048
+      },
+      "timings": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.000229,
+          "milliseconds": 0.229
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.000707,
+          "milliseconds": 0.707
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.001569,
+          "milliseconds": 1.569
+        },
+        "measurement_simulation": {
+          "seconds": 0.200026,
+          "milliseconds": 200.026
+        },
+        "triple_total": {
+          "seconds": 0.202539,
+          "milliseconds": 202.539
+        }
+      }
+    }
+  ],
+  "uniform_superposition": {
+    "ideal_probabilities": {
+      "00000001": 0.1666666666666667,
+      "00001101": 0.1666666666666667,
+      "00010100": 0.1666666666666667,
+      "00110010": 0.1666666666666667,
+      "01011110": 0.1666666666666667,
+      "10011011": 0.1666666666666667
+    },
+    "counts": {
+      "00000001": 337,
+      "00001101": 356,
+      "00010100": 359,
+      "00110010": 328,
+      "01011110": 335,
+      "10011011": 333
+    },
+    "empirical_probabilities": {
+      "00000001": 0.16455078125,
+      "00001101": 0.173828125,
+      "00010100": 0.17529296875,
+      "00110010": 0.16015625,
+      "01011110": 0.16357421875,
+      "10011011": 0.16259765625
+    }
+  },
+  "timings": {
+    "encoding_pipeline": {
+      "encoded_state_metadata_build": {
+        "seconds": 5.4e-05,
+        "milliseconds": 0.054
+      },
+      "per_triple_summary": {
+        "state_preparation_circuit_build": {
+          "count": 6,
+          "total": {
+            "seconds": 0.001124,
+            "milliseconds": 1.124
+          },
+          "average": {
+            "seconds": 0.000187,
+            "milliseconds": 0.187
+          },
+          "minimum": {
+            "seconds": 0.000105,
+            "milliseconds": 0.105
+          },
+          "maximum": {
+            "seconds": 0.000229,
+            "milliseconds": 0.229
+          }
+        },
+        "ideal_statevector_simulation": {
+          "count": 6,
+          "total": {
+            "seconds": 0.005606,
+            "milliseconds": 5.606
+          },
+          "average": {
+            "seconds": 0.000934,
+            "milliseconds": 0.934
+          },
+          "minimum": {
+            "seconds": 0.000533,
+            "milliseconds": 0.533
+          },
+          "maximum": {
+            "seconds": 0.002559,
+            "milliseconds": 2.559
+          }
+        },
+        "measurement_circuit_preparation": {
+          "count": 6,
+          "total": {
+            "seconds": 0.002575,
+            "milliseconds": 2.575
+          },
+          "average": {
+            "seconds": 0.000429,
+            "milliseconds": 0.429
+          },
+          "minimum": {
+            "seconds": 0.000151,
+            "milliseconds": 0.151
+          },
+          "maximum": {
+            "seconds": 0.001569,
+            "milliseconds": 1.569
+          }
+        },
+        "measurement_simulation": {
+          "count": 6,
+          "total": {
+            "seconds": 1.186884,
+            "milliseconds": 1186.884
+          },
+          "average": {
+            "seconds": 0.197814,
+            "milliseconds": 197.814
+          },
+          "minimum": {
+            "seconds": 0.161438,
+            "milliseconds": 161.438
+          },
+          "maximum": {
+            "seconds": 0.235878,
+            "milliseconds": 235.878
+          }
+        },
+        "triple_total": {
+          "count": 6,
+          "total": {
+            "seconds": 1.196236,
+            "milliseconds": 1196.236
+          },
+          "average": {
+            "seconds": 0.199373,
+            "milliseconds": 199.373
+          },
+          "minimum": {
+            "seconds": 0.162366,
+            "milliseconds": 162.366
+          },
+          "maximum": {
+            "seconds": 0.236915,
+            "milliseconds": 236.915
+          }
+        }
+      },
+      "uniform_superposition": {
+        "state_preparation_circuit_build": {
+          "seconds": 0.001284,
+          "milliseconds": 1.284
+        },
+        "ideal_statevector_simulation": {
+          "seconds": 0.049342,
+          "milliseconds": 49.342
+        },
+        "measurement_circuit_preparation": {
+          "seconds": 0.000259,
+          "milliseconds": 0.259
+        },
+        "measurement_simulation": {
+          "seconds": 0.252573,
+          "milliseconds": 252.573
+        },
+        "total": {
+          "seconds": 0.303475,
+          "milliseconds": 303.475
+        }
+      },
+      "plot_generation": {
+        "seconds": 0.285636,
+        "milliseconds": 285.636
+      },
+      "pipeline_total": {
+        "seconds": 1.785531,
+        "milliseconds": 1785.531
+      }
+    },
+    "setup": {
+      "load_rdf_and_parse_triples": {
+        "seconds": 0.004346,
+        "milliseconds": 4.346
+      },
+      "build_id_mappings_and_context": {
+        "seconds": 0.000135,
+        "milliseconds": 0.135
+      },
+      "prepare_results_directories": {
+        "seconds": 7.4e-05,
+        "milliseconds": 0.074
+      }
+    },
+    "output": {
+      "json_log_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/results/logs/running_example_basis.json",
+      "json_log_write": {
+        "seconds": 0.001043,
+        "milliseconds": 1.043
+      }
+    },
+    "program": {
+      "run_started_at_utc": "2026-04-17T13:40:27+00:00",
+      "selected_encoding": "basis",
+      "encoding_dispatch_total": {
+        "seconds": 1.785625,
+        "milliseconds": 1785.625
+      },
+      "total_runtime": {
+        "seconds": 1.792715,
+        "milliseconds": 1792.715
+      },
+      "run_finished_at_utc": "2026-04-17T13:40:29+00:00",
+      "timing_note": "json_log_write was measured on a first write pass so it could be embedded in the final JSON log."
+    }
+  }
+}
