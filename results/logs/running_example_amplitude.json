@@ -1,7 +1,7 @@
 {
   "encoding": "amplitude",
   "context": {
-    "dataset_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/data/running_example.ttl",
+    "dataset_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\data\\running_example.ttl",
     "fixed_thesis_mapping": false,
     "triple_count": 6,
     "entity_count": 7,
@@ -56,26 +56,18 @@
       "http://www.w3.org/2000/01/rdf-schema#subClassOf": 3
     }
   },
-  "strategy": "custom",
+  "strategy": "uniform",
   "raw_vector": [
-    2.0,
-    1.0,
-    3.0,
     1.0,
     1.0,
-    2.0
+    1.0,
+    1.0,
+    1.0,
+    1.0
   ],
   "padded_vector": [
     [
-      2.0,
-      0.0
-    ],
-    [
       1.0,
-      0.0
-    ],
-    [
-      3.0,
       0.0
     ],
     [
@@ -87,7 +79,15 @@
       0.0
     ],
     [
-      2.0,
+      1.0,
+      0.0
+    ],
+    [
+      1.0,
+      0.0
+    ],
+    [
+      1.0,
       0.0
     ],
     [
@@ -101,27 +101,27 @@
   ],
   "normalized_vector": [
     [
-      0.4472135954999579,
+      0.4082482904638631,
       0.0
     ],
     [
-      0.22360679774997896,
+      0.4082482904638631,
       0.0
     ],
     [
-      0.6708203932499369,
+      0.4082482904638631,
       0.0
     ],
     [
-      0.22360679774997896,
+      0.4082482904638631,
       0.0
     ],
     [
-      0.22360679774997896,
+      0.4082482904638631,
       0.0
     ],
     [
-      0.4472135954999579,
+      0.4082482904638631,
       0.0
     ],
     [
@@ -194,97 +194,97 @@
     "111"
   ],
   "ideal_probabilities": {
-    "000": 0.19999999999999998,
-    "001": 0.049999999999999996,
-    "010": 0.45,
-    "011": 0.049999999999999996,
-    "100": 0.049999999999999996,
-    "101": 0.19999999999999998
+    "000": 0.1666666666666667,
+    "001": 0.1666666666666667,
+    "010": 0.1666666666666667,
+    "011": 0.1666666666666667,
+    "100": 0.1666666666666667,
+    "101": 0.1666666666666667
   },
   "counts": {
-    "000": 422,
-    "001": 88,
-    "010": 892,
-    "011": 116,
-    "100": 106,
-    "101": 424
+    "000": 325,
+    "001": 324,
+    "010": 357,
+    "011": 348,
+    "100": 342,
+    "101": 352
   },
   "empirical_probabilities": {
-    "000": 0.2060546875,
-    "001": 0.04296875,
-    "010": 0.435546875,
-    "011": 0.056640625,
-    "100": 0.0517578125,
-    "101": 0.20703125
+    "000": 0.15869140625,
+    "001": 0.158203125,
+    "010": 0.17431640625,
+    "011": 0.169921875,
+    "100": 0.1669921875,
+    "101": 0.171875
   },
   "timings": {
     "encoding_pipeline": {
       "weights_parsing": {
-        "seconds": 1.3e-05,
-        "milliseconds": 0.013
+        "seconds": 1e-06,
+        "milliseconds": 0.001
       },
       "vector_and_metadata_build": {
-        "seconds": 0.000246,
-        "milliseconds": 0.246
+        "seconds": 0.000212,
+        "milliseconds": 0.212
       },
       "state_preparation_circuit_build": {
-        "seconds": 0.000726,
-        "milliseconds": 0.726
+        "seconds": 0.000349,
+        "milliseconds": 0.349
       },
       "ideal_statevector_simulation": {
-        "seconds": 0.003875,
-        "milliseconds": 3.875
+        "seconds": 0.000856,
+        "milliseconds": 0.856
       },
       "measurement_circuit_preparation": {
-        "seconds": 0.000272,
-        "milliseconds": 0.272
+        "seconds": 0.000111,
+        "milliseconds": 0.111
       },
       "measurement_simulation": {
-        "seconds": 0.171215,
-        "milliseconds": 171.215
+        "seconds": 0.107538,
+        "milliseconds": 107.538
       },
       "plot_generation": {
-        "seconds": 0.244802,
-        "milliseconds": 244.802
+        "seconds": 0.0,
+        "milliseconds": 0.0
       },
       "pipeline_total": {
-        "seconds": 0.421181,
-        "milliseconds": 421.181
+        "seconds": 0.109074,
+        "milliseconds": 109.074
       }
     },
     "setup": {
       "load_rdf_and_parse_triples": {
-        "seconds": 0.004761,
-        "milliseconds": 4.761
+        "seconds": 0.004183,
+        "milliseconds": 4.183
       },
       "build_id_mappings_and_context": {
-        "seconds": 0.000157,
-        "milliseconds": 0.157
+        "seconds": 0.000206,
+        "milliseconds": 0.206
       },
       "prepare_results_directories": {
-        "seconds": 6.9e-05,
-        "milliseconds": 0.069
+        "seconds": 0.000289,
+        "milliseconds": 0.289
       }
     },
     "output": {
-      "json_log_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/results/logs/running_example_amplitude.json",
+      "json_log_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\results\\logs\\running_example_amplitude.json",
       "json_log_write": {
-        "seconds": 0.000726,
-        "milliseconds": 0.726
+        "seconds": 0.001018,
+        "milliseconds": 1.018
       }
     },
     "program": {
-      "run_started_at_utc": "2026-04-17T13:40:27+00:00",
+      "run_started_at_utc": "2026-05-20T14:56:45+00:00",
       "selected_encoding": "amplitude",
       "encoding_dispatch_total": {
-        "seconds": 0.42127,
-        "milliseconds": 421.27
+        "seconds": 0.109137,
+        "milliseconds": 109.137
       },
       "total_runtime": {
-        "seconds": 0.428561,
-        "milliseconds": 428.561
+        "seconds": 0.11605,
+        "milliseconds": 116.05
       },
-      "run_finished_at_utc": "2026-04-17T13:40:28+00:00",
+      "run_finished_at_utc": "2026-05-20T14:56:45+00:00",
       "timing_note": "json_log_write was measured on a first write pass so it could be embedded in the final JSON log."
     }
   }

@@ -9,7 +9,12 @@ from src.models import TripleRecord
 
 SUPPORTED_RDF_FORMATS = {
     ".ttl": "turtle",
+    ".rdf": "xml",
+    ".xml": "xml",
+    ".nt": "nt",
 }
+
+FALLBACK_RDF_FORMATS = ("turtle", "xml", "nt")
 
 
 def infer_rdf_format(file_path: str | Path) -> str:
@@ -41,8 +46,31 @@ def load_rdf_graph(file_path: str | Path, rdf_format: str | None = None) -> Grap
 
     path = Path(file_path)
     graph = Graph()
-    graph.parse(path, format=rdf_format or infer_rdf_format(path))
-    return graph
+    if rdf_format is not None:
+        graph.parse(path, format=rdf_format)
+        return graph
+
+    first_format = infer_rdf_format(path)
+    candidate_formats = [first_format]
+    candidate_formats.extend(
+        rdf_format
+        for rdf_format in FALLBACK_RDF_FORMATS
+        if rdf_format not in candidate_formats
+    )
+
+    parse_errors: list[str] = []
+    for candidate_format in candidate_formats:
+        graph = Graph()
+        try:
+            graph.parse(path, format=candidate_format)
+            return graph
+        except Exception as exc:
+            parse_errors.append(f"{candidate_format}: {type(exc).__name__}: {exc}")
+
+    raise ValueError(
+        f"Could not parse RDF file '{path}' with supported formats. "
+        f"Tried: {'; '.join(parse_errors)}"
+    )
 
 
 def extract_triples(graph: Graph) -> list[TripleRecord]:

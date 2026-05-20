@@ -1,7 +1,7 @@
 {
   "encoding": "phase",
   "context": {
-    "dataset_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/data/running_example.ttl",
+    "dataset_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\data\\running_example.ttl",
     "fixed_thesis_mapping": false,
     "triple_count": 6,
     "entity_count": 7,
@@ -123,144 +123,144 @@
       "101": 0.1666666666666667
     },
     "counts": {
-      "000": 350,
-      "001": 362,
-      "010": 306,
-      "011": 366,
-      "100": 343,
-      "101": 321
+      "000": 362,
+      "001": 342,
+      "010": 335,
+      "011": 350,
+      "100": 329,
+      "101": 330
     },
     "empirical_probabilities": {
-      "000": 0.1708984375,
-      "001": 0.1767578125,
-      "010": 0.1494140625,
-      "011": 0.1787109375,
-      "100": 0.16748046875,
-      "101": 0.15673828125
+      "000": 0.1767578125,
+      "001": 0.1669921875,
+      "010": 0.16357421875,
+      "011": 0.1708984375,
+      "100": 0.16064453125,
+      "101": 0.1611328125
     }
   },
   "after_mixing": {
     "ideal_probabilities": {
       "000": 0.3333333333333333,
       "001": 0.08333333333333333,
-      "010": 3.8060204764604725e-34,
+      "010": 3.1244995472122033e-34,
       "011": 0.08333333333333333,
-      "100": 4.378626592867524e-33,
+      "100": 3.1244995472122033e-34,
       "101": 0.08333333333333333,
       "110": 0.3333333333333333,
       "111": 0.08333333333333333
     },
     "counts": {
-      "000": 672,
-      "001": 181,
-      "011": 166,
+      "000": 701,
+      "001": 166,
+      "011": 171,
       "101": 171,
-      "110": 692,
-      "111": 166
+      "110": 659,
+      "111": 180
     },
     "empirical_probabilities": {
-      "000": 0.328125,
-      "001": 0.08837890625,
-      "011": 0.0810546875,
+      "000": 0.34228515625,
+      "001": 0.0810546875,
+      "011": 0.08349609375,
       "101": 0.08349609375,
-      "110": 0.337890625,
-      "111": 0.0810546875
+      "110": 0.32177734375,
+      "111": 0.087890625
     }
   },
   "timings": {
     "encoding_pipeline": {
       "mark_rule_selection": {
-        "seconds": 3e-06,
-        "milliseconds": 0.003
+        "seconds": 2e-06,
+        "milliseconds": 0.002
       },
       "phase_marked_state_preparation": {
-        "seconds": 0.001254,
-        "milliseconds": 1.254
+        "seconds": 0.002374,
+        "milliseconds": 2.374
       },
       "interference_circuit_preparation": {
-        "seconds": 0.000111,
-        "milliseconds": 0.111
+        "seconds": 0.000115,
+        "milliseconds": 0.115
       },
       "before_mixing": {
         "ideal_statevector_simulation": {
-          "seconds": 0.00314,
-          "milliseconds": 3.14
+          "seconds": 0.000935,
+          "milliseconds": 0.935
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000195,
-          "milliseconds": 0.195
+          "seconds": 9.4e-05,
+          "milliseconds": 0.094
         },
         "measurement_simulation": {
-          "seconds": 0.222401,
-          "milliseconds": 222.401
+          "seconds": 0.081171,
+          "milliseconds": 81.171
         }
       },
       "after_mixing": {
         "ideal_statevector_simulation": {
-          "seconds": 0.000992,
-          "milliseconds": 0.992
+          "seconds": 0.000412,
+          "milliseconds": 0.412
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000244,
-          "milliseconds": 0.244
+          "seconds": 0.000139,
+          "milliseconds": 0.139
         },
         "measurement_simulation": {
-          "seconds": 0.168056,
-          "milliseconds": 168.056
+          "seconds": 0.094358,
+          "milliseconds": 94.358
         }
       },
       "plot_generation": {
         "before_mixing_plot": {
-          "seconds": 0.336749,
-          "milliseconds": 336.749
+          "seconds": 0.225784,
+          "milliseconds": 225.784
         },
         "after_mixing_plot": {
-          "seconds": 0.24828,
-          "milliseconds": 248.28
+          "seconds": 0.170304,
+          "milliseconds": 170.304
         },
         "total": {
-          "seconds": 0.585028,
-          "milliseconds": 585.028
+          "seconds": 0.396088,
+          "milliseconds": 396.088
         }
       },
       "pipeline_total": {
-        "seconds": 0.981491,
-        "milliseconds": 981.491
+        "seconds": 0.575777,
+        "milliseconds": 575.777
       }
     },
     "setup": {
       "load_rdf_and_parse_triples": {
-        "seconds": 0.004941,
-        "milliseconds": 4.941
+        "seconds": 0.003649,
+        "milliseconds": 3.649
       },
       "build_id_mappings_and_context": {
-        "seconds": 0.000166,
-        "milliseconds": 0.166
+        "seconds": 0.000209,
+        "milliseconds": 0.209
       },
       "prepare_results_directories": {
-        "seconds": 6.5e-05,
-        "milliseconds": 0.065
+        "seconds": 0.000311,
+        "milliseconds": 0.311
       }
     },
     "output": {
-      "json_log_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/results/logs/running_example_phase.json",
+      "json_log_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\results\\logs\\running_example_phase.json",
       "json_log_write": {
-        "seconds": 0.000787,
-        "milliseconds": 0.787
+        "seconds": 0.000705,
+        "milliseconds": 0.705
       }
     },
     "program": {
-      "run_started_at_utc": "2026-04-17T13:40:27+00:00",
+      "run_started_at_utc": "2026-05-20T11:56:09+00:00",
       "selected_encoding": "phase",
       "encoding_dispatch_total": {
-        "seconds": 0.981566,
-        "milliseconds": 981.566
+        "seconds": 0.575831,
+        "milliseconds": 575.831
       },
       "total_runtime": {
-        "seconds": 0.989164,
-        "milliseconds": 989.164
+        "seconds": 0.581675,
+        "milliseconds": 581.675
       },
-      "run_finished_at_utc": "2026-04-17T13:40:28+00:00",
+      "run_finished_at_utc": "2026-05-20T11:56:10+00:00",
       "timing_note": "json_log_write was measured on a first write pass so it could be embedded in the final JSON log."
     }
   }

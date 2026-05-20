@@ -1,7 +1,7 @@
 {
   "encoding": "basis",
   "context": {
-    "dataset_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/data/running_example.ttl",
+    "dataset_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\data\\running_example.ttl",
     "fixed_thesis_mapping": false,
     "triple_count": 6,
     "entity_count": 7,
@@ -84,24 +84,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.000105,
-          "milliseconds": 0.105
+          "seconds": 6.2e-05,
+          "milliseconds": 0.062
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.002559,
-          "milliseconds": 2.559
+          "seconds": 0.000399,
+          "milliseconds": 0.399
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000264,
-          "milliseconds": 0.264
+          "seconds": 0.016062,
+          "milliseconds": 16.062
         },
         "measurement_simulation": {
-          "seconds": 0.190138,
-          "milliseconds": 190.138
+          "seconds": 0.146839,
+          "milliseconds": 146.839
         },
         "triple_total": {
-          "seconds": 0.193074,
-          "milliseconds": 193.074
+          "seconds": 0.163366,
+          "milliseconds": 163.366
         }
       }
     },
@@ -132,24 +132,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.00016,
-          "milliseconds": 0.16
+          "seconds": 8.4e-05,
+          "milliseconds": 0.084
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.000594,
-          "milliseconds": 0.594
+          "seconds": 0.00051,
+          "milliseconds": 0.51
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000274,
-          "milliseconds": 0.274
+          "seconds": 0.000121,
+          "milliseconds": 0.121
         },
         "measurement_simulation": {
-          "seconds": 0.235878,
-          "milliseconds": 235.878
+          "seconds": 0.102921,
+          "milliseconds": 102.921
         },
         "triple_total": {
-          "seconds": 0.236915,
-          "milliseconds": 236.915
+          "seconds": 0.103641,
+          "milliseconds": 103.641
         }
       }
     },
@@ -180,24 +180,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.000208,
-          "milliseconds": 0.208
+          "seconds": 7.6e-05,
+          "milliseconds": 0.076
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.000533,
-          "milliseconds": 0.533
+          "seconds": 0.00042,
+          "milliseconds": 0.42
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000151,
-          "milliseconds": 0.151
+          "seconds": 0.000124,
+          "milliseconds": 0.124
         },
         "measurement_simulation": {
-          "seconds": 0.177066,
-          "milliseconds": 177.066
+          "seconds": 0.097852,
+          "milliseconds": 97.852
         },
         "triple_total": {
-          "seconds": 0.177965,
-          "milliseconds": 177.965
+          "seconds": 0.098477,
+          "milliseconds": 98.477
         }
       }
     },
@@ -228,24 +228,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.000205,
-          "milliseconds": 0.205
+          "seconds": 7.1e-05,
+          "milliseconds": 0.071
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.000559,
-          "milliseconds": 0.559
+          "seconds": 0.000432,
+          "milliseconds": 0.432
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000157,
-          "milliseconds": 0.157
+          "seconds": 9.9e-05,
+          "milliseconds": 0.099
         },
         "measurement_simulation": {
-          "seconds": 0.161438,
-          "milliseconds": 161.438
+          "seconds": 0.09809,
+          "milliseconds": 98.09
         },
         "triple_total": {
-          "seconds": 0.162366,
-          "milliseconds": 162.366
+          "seconds": 0.098696,
+          "milliseconds": 98.696
         }
       }
     },
@@ -276,24 +276,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.000215,
-          "milliseconds": 0.215
+          "seconds": 7.5e-05,
+          "milliseconds": 0.075
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.000655,
-          "milliseconds": 0.655
+          "seconds": 0.000493,
+          "milliseconds": 0.493
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000161,
-          "milliseconds": 0.161
+          "seconds": 0.000116,
+          "milliseconds": 0.116
         },
         "measurement_simulation": {
-          "seconds": 0.222338,
-          "milliseconds": 222.338
+          "seconds": 0.102497,
+          "milliseconds": 102.497
         },
         "triple_total": {
-          "seconds": 0.223376,
-          "milliseconds": 223.376
+          "seconds": 0.103186,
+          "milliseconds": 103.186
         }
       }
     },
@@ -324,24 +324,24 @@
       },
       "timings": {
         "state_preparation_circuit_build": {
-          "seconds": 0.000229,
-          "milliseconds": 0.229
+          "seconds": 7.5e-05,
+          "milliseconds": 0.075
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.000707,
-          "milliseconds": 0.707
+          "seconds": 0.000466,
+          "milliseconds": 0.466
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.001569,
-          "milliseconds": 1.569
+          "seconds": 9.5e-05,
+          "milliseconds": 0.095
         },
         "measurement_simulation": {
-          "seconds": 0.200026,
-          "milliseconds": 200.026
+          "seconds": 0.096977,
+          "milliseconds": 96.977
         },
         "triple_total": {
-          "seconds": 0.202539,
-          "milliseconds": 202.539
+          "seconds": 0.097618,
+          "milliseconds": 97.618
         }
       }
     }
@@ -356,189 +356,189 @@
       "10011011": 0.1666666666666667
     },
     "counts": {
-      "00000001": 337,
-      "00001101": 356,
-      "00010100": 359,
-      "00110010": 328,
-      "01011110": 335,
-      "10011011": 333
+      "00000001": 346,
+      "00001101": 310,
+      "00010100": 309,
+      "00110010": 397,
+      "01011110": 339,
+      "10011011": 347
     },
     "empirical_probabilities": {
-      "00000001": 0.16455078125,
-      "00001101": 0.173828125,
-      "00010100": 0.17529296875,
-      "00110010": 0.16015625,
-      "01011110": 0.16357421875,
-      "10011011": 0.16259765625
+      "00000001": 0.1689453125,
+      "00001101": 0.1513671875,
+      "00010100": 0.15087890625,
+      "00110010": 0.19384765625,
+      "01011110": 0.16552734375,
+      "10011011": 0.16943359375
     }
   },
   "timings": {
     "encoding_pipeline": {
       "encoded_state_metadata_build": {
-        "seconds": 5.4e-05,
-        "milliseconds": 0.054
+        "seconds": 3e-05,
+        "milliseconds": 0.03
       },
       "per_triple_summary": {
         "state_preparation_circuit_build": {
           "count": 6,
           "total": {
-            "seconds": 0.001124,
-            "milliseconds": 1.124
+            "seconds": 0.000444,
+            "milliseconds": 0.444
           },
           "average": {
-            "seconds": 0.000187,
-            "milliseconds": 0.187
+            "seconds": 7.4e-05,
+            "milliseconds": 0.074
           },
           "minimum": {
-            "seconds": 0.000105,
-            "milliseconds": 0.105
+            "seconds": 6.2e-05,
+            "milliseconds": 0.062
           },
           "maximum": {
-            "seconds": 0.000229,
-            "milliseconds": 0.229
+            "seconds": 8.4e-05,
+            "milliseconds": 0.084
           }
         },
         "ideal_statevector_simulation": {
           "count": 6,
           "total": {
-            "seconds": 0.005606,
-            "milliseconds": 5.606
+            "seconds": 0.00272,
+            "milliseconds": 2.72
           },
           "average": {
-            "seconds": 0.000934,
-            "milliseconds": 0.934
+            "seconds": 0.000453,
+            "milliseconds": 0.453
           },
           "minimum": {
-            "seconds": 0.000533,
-            "milliseconds": 0.533
+            "seconds": 0.000399,
+            "milliseconds": 0.399
           },
           "maximum": {
-            "seconds": 0.002559,
-            "milliseconds": 2.559
+            "seconds": 0.00051,
+            "milliseconds": 0.51
           }
         },
         "measurement_circuit_preparation": {
           "count": 6,
           "total": {
-            "seconds": 0.002575,
-            "milliseconds": 2.575
+            "seconds": 0.016616,
+            "milliseconds": 16.616
           },
           "average": {
-            "seconds": 0.000429,
-            "milliseconds": 0.429
+            "seconds": 0.002769,
+            "milliseconds": 2.769
           },
           "minimum": {
-            "seconds": 0.000151,
-            "milliseconds": 0.151
+            "seconds": 9.5e-05,
+            "milliseconds": 0.095
           },
           "maximum": {
-            "seconds": 0.001569,
-            "milliseconds": 1.569
+            "seconds": 0.016062,
+            "milliseconds": 16.062
           }
         },
         "measurement_simulation": {
           "count": 6,
           "total": {
-            "seconds": 1.186884,
-            "milliseconds": 1186.884
+            "seconds": 0.645175,
+            "milliseconds": 645.175
           },
           "average": {
-            "seconds": 0.197814,
-            "milliseconds": 197.814
+            "seconds": 0.107529,
+            "milliseconds": 107.529
           },
           "minimum": {
-            "seconds": 0.161438,
-            "milliseconds": 161.438
+            "seconds": 0.096977,
+            "milliseconds": 96.977
           },
           "maximum": {
-            "seconds": 0.235878,
-            "milliseconds": 235.878
+            "seconds": 0.146839,
+            "milliseconds": 146.839
           }
         },
         "triple_total": {
           "count": 6,
           "total": {
-            "seconds": 1.196236,
-            "milliseconds": 1196.236
+            "seconds": 0.664985,
+            "milliseconds": 664.985
           },
           "average": {
-            "seconds": 0.199373,
-            "milliseconds": 199.373
+            "seconds": 0.110831,
+            "milliseconds": 110.831
           },
           "minimum": {
-            "seconds": 0.162366,
-            "milliseconds": 162.366
+            "seconds": 0.097618,
+            "milliseconds": 97.618
           },
           "maximum": {
-            "seconds": 0.236915,
-            "milliseconds": 236.915
+            "seconds": 0.163366,
+            "milliseconds": 163.366
           }
         }
       },
       "uniform_superposition": {
         "state_preparation_circuit_build": {
-          "seconds": 0.001284,
-          "milliseconds": 1.284
+          "seconds": 0.000925,
+          "milliseconds": 0.925
         },
         "ideal_statevector_simulation": {
-          "seconds": 0.049342,
-          "milliseconds": 49.342
+          "seconds": 0.030329,
+          "milliseconds": 30.329
         },
         "measurement_circuit_preparation": {
-          "seconds": 0.000259,
-          "milliseconds": 0.259
+          "seconds": 0.000192,
+          "milliseconds": 0.192
         },
         "measurement_simulation": {
-          "seconds": 0.252573,
-          "milliseconds": 252.573
+          "seconds": 0.091203,
+          "milliseconds": 91.203
         },
         "total": {
-          "seconds": 0.303475,
-          "milliseconds": 303.475
+          "seconds": 0.122663,
+          "milliseconds": 122.663
         }
       },
       "plot_generation": {
-        "seconds": 0.285636,
-        "milliseconds": 285.636
+        "seconds": 0.739583,
+        "milliseconds": 739.583
       },
       "pipeline_total": {
-        "seconds": 1.785531,
-        "milliseconds": 1785.531
+        "seconds": 1.527364,
+        "milliseconds": 1527.364
       }
     },
     "setup": {
       "load_rdf_and_parse_triples": {
-        "seconds": 0.004346,
-        "milliseconds": 4.346
+        "seconds": 0.00378,
+        "milliseconds": 3.78
       },
       "build_id_mappings_and_context": {
-        "seconds": 0.000135,
-        "milliseconds": 0.135
+        "seconds": 0.000192,
+        "milliseconds": 0.192
       },
       "prepare_results_directories": {
-        "seconds": 7.4e-05,
-        "milliseconds": 0.074
+        "seconds": 0.000321,
+        "milliseconds": 0.321
       }
     },
     "output": {
-      "json_log_path": "/home/mrdoumanis/Desktop/GitHub/Quskit-KG-Ecodings/results/logs/running_example_basis.json",
+      "json_log_path": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\results\\logs\\running_example_basis.json",
       "json_log_write": {
-        "seconds": 0.001043,
-        "milliseconds": 1.043
+        "seconds": 0.002464,
+        "milliseconds": 2.464
       }
     },
     "program": {
-      "run_started_at_utc": "2026-04-17T13:40:27+00:00",
+      "run_started_at_utc": "2026-05-20T11:55:56+00:00",
       "selected_encoding": "basis",
       "encoding_dispatch_total": {
-        "seconds": 1.785625,
-        "milliseconds": 1785.625
+        "seconds": 1.527437,
+        "milliseconds": 1527.437
       },
       "total_runtime": {
-        "seconds": 1.792715,
-        "milliseconds": 1792.715
+        "seconds": 1.535427,
+        "milliseconds": 1535.427
       },
-      "run_finished_at_utc": "2026-04-17T13:40:29+00:00",
+      "run_finished_at_utc": "2026-05-20T11:55:58+00:00",
       "timing_note": "json_log_write was measured on a first write pass so it could be embedded in the final JSON log."
     }
   }

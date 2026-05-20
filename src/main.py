@@ -4,7 +4,13 @@ import argparse
 from datetime import datetime, timezone
 import math
 from pathlib import Path
+import sys
 import time
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from qiskit import QuantumCircuit, transpile
 from qiskit.quantum_info import Statevector
@@ -36,7 +42,7 @@ from src.visualization import (
 )
 
 
-DEFAULT_DATASET = Path(__file__).resolve().parent.parent / "data" / "running_example.ttl"
+DEFAULT_DATASET = REPO_ROOT / "data" / "running_example.ttl"
 DEFAULT_PHASE_DEMO_PREDICATE = "http://example.org/teaches"
 
 
@@ -578,7 +584,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--results-dir",
-        default="results",
+        default=str(REPO_ROOT / "results"),
         help="Base output directory for logs and figures.",
     )
     parser.add_argument(
