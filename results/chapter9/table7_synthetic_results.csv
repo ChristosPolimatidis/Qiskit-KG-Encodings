@@ -1,0 +1,85 @@
+triple_count,entity_count,predicate_count,encoding,index_mode,qubits,dimension,preprocessing_time_ms,encoding_time_ms,circuit_construction_time_ms,transpilation_time_ms,simulation_time_ms,total_time_ms,circuit_depth,gate_count,transpiled_depth,transpiled_gate_count,status,notes
+6,3,5,basis,entity-predicate-object,7,128,5.457,0.031,0.444,--,0.163,29.836,1,1,170,182,success,software-level observation; no quantum-advantage claim
+6,3,5,amplitude,compact,3,8,1.017,0.083,0.079,--,0.083,5.12,1,1,10,14,success,software-level observation; no quantum-advantage claim
+6,3,5,phase,sequential-index,3,8,1.05,0.172,0.234,--,0.914,7.995,3,5,18,26,success,software-level observation; no quantum-advantage claim
+6,3,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+6,3,5,basis,entity-predicate-object,7,128,0.861,0.024,0.175,--,0.231,23.524,1,1,170,182,success,software-level observation; no quantum-advantage claim
+6,3,5,amplitude,compact,3,8,0.998,0.097,0.102,--,0.089,5.431,1,1,10,14,success,software-level observation; no quantum-advantage claim
+6,3,5,phase,sequential-index,3,8,0.913,0.154,0.237,--,0.694,6.899,3,5,18,26,success,software-level observation; no quantum-advantage claim
+6,3,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+6,3,5,basis,entity-predicate-object,7,128,0.872,0.024,0.171,--,0.148,23.629,1,1,170,182,success,software-level observation; no quantum-advantage claim
+6,3,5,amplitude,compact,3,8,1.117,0.084,0.083,--,0.084,7.315,1,1,10,14,success,software-level observation; no quantum-advantage claim
+6,3,5,phase,sequential-index,3,8,0.903,0.149,0.206,--,1.611,8.041,3,5,18,26,success,software-level observation; no quantum-advantage claim
+6,3,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+10,5,5,basis,entity-predicate-object,9,512,2.213,0.054,0.727,--,0.211,93.693,1,1,985,1002,success,software-level observation; no quantum-advantage claim
+10,5,5,amplitude,compact,4,16,1.05,0.086,0.088,--,0.202,8.912,1,1,19,26,success,software-level observation; no quantum-advantage claim
+10,5,5,phase,sequential-index,4,16,1.049,0.223,0.233,--,0.695,8.883,3,6,40,54,success,software-level observation; no quantum-advantage claim
+10,5,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+10,5,5,basis,entity-predicate-object,9,512,0.925,0.034,0.424,--,0.222,107.834,1,1,985,1002,success,software-level observation; no quantum-advantage claim
+10,5,5,amplitude,compact,4,16,1.031,0.089,0.098,--,0.104,6.435,1,1,19,26,success,software-level observation; no quantum-advantage claim
+10,5,5,phase,sequential-index,4,16,0.959,0.229,0.204,--,0.734,8.574,3,6,40,54,success,software-level observation; no quantum-advantage claim
+10,5,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+10,5,5,basis,entity-predicate-object,9,512,1.024,0.036,0.445,--,0.215,93.454,1,1,985,1002,success,software-level observation; no quantum-advantage claim
+10,5,5,amplitude,compact,4,16,1.091,0.095,0.097,--,0.109,6.973,1,1,19,26,success,software-level observation; no quantum-advantage claim
+10,5,5,phase,sequential-index,4,16,0.98,0.203,0.216,--,0.679,8.451,3,6,40,54,success,software-level observation; no quantum-advantage claim
+10,5,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+25,12,5,basis,entity-predicate-object,11,2048,2.278,0.077,1.402,--,0.393,358.512,1,1,4074,4094,success,software-level observation; no quantum-advantage claim
+25,12,5,amplitude,compact,5,32,1.394,0.104,0.125,--,0.162,8.463,1,1,20,30,success,software-level observation; no quantum-advantage claim
+25,12,5,phase,sequential-index,5,32,1.297,0.392,0.296,--,0.799,10.695,3,7,93,119,success,software-level observation; no quantum-advantage claim
+25,12,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+25,12,5,basis,entity-predicate-object,11,2048,1.309,0.085,1.732,--,0.363,362.069,1,1,4074,4094,success,software-level observation; no quantum-advantage claim
+25,12,5,amplitude,compact,5,32,1.492,0.128,0.215,--,0.163,9.342,1,1,20,30,success,software-level observation; no quantum-advantage claim
+25,12,5,phase,sequential-index,5,32,1.461,0.4,0.288,--,0.787,11.393,3,7,93,119,success,software-level observation; no quantum-advantage claim
+25,12,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+25,12,5,basis,entity-predicate-object,11,2048,1.296,0.076,1.389,--,0.351,367.278,1,1,4074,4094,success,software-level observation; no quantum-advantage claim
+25,12,5,amplitude,compact,5,32,1.463,0.113,0.116,--,0.152,8.657,1,1,20,30,success,software-level observation; no quantum-advantage claim
+25,12,5,phase,sequential-index,5,32,1.902,0.822,0.433,--,1.452,18.8,3,7,93,119,success,software-level observation; no quantum-advantage claim
+25,12,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+50,25,5,basis,entity-predicate-object,13,8192,3.566,0.163,6.233,--,0.7,1472.245,1,1,16358,16382,success,software-level observation; no quantum-advantage claim
+50,25,5,amplitude,compact,6,64,2.246,0.558,0.165,--,0.265,16.187,1,1,82,94,success,software-level observation; no quantum-advantage claim
+50,25,5,phase,sequential-index,6,64,1.888,0.749,0.63,--,1.39,22.608,3,8,226,260,success,software-level observation; no quantum-advantage claim
+50,25,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+50,25,5,basis,entity-predicate-object,13,8192,1.889,0.143,5.119,--,0.686,1422.97,1,1,16358,16382,success,software-level observation; no quantum-advantage claim
+50,25,5,amplitude,compact,6,64,1.973,0.14,0.162,--,0.26,16.629,1,1,82,94,success,software-level observation; no quantum-advantage claim
+50,25,5,phase,sequential-index,6,64,1.823,0.715,0.655,--,1.351,20.423,3,8,226,260,success,software-level observation; no quantum-advantage claim
+50,25,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+50,25,5,basis,entity-predicate-object,13,8192,1.797,0.155,5.272,--,0.712,1475.177,1,1,16358,16382,success,software-level observation; no quantum-advantage claim
+50,25,5,amplitude,compact,6,64,1.971,0.128,0.16,--,0.266,17.424,1,1,82,94,success,software-level observation; no quantum-advantage claim
+50,25,5,phase,sequential-index,6,64,2.006,0.789,0.651,--,1.391,20.855,3,8,226,260,success,software-level observation; no quantum-advantage claim
+50,25,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+100,50,5,basis,entity-predicate-object,15,32768,4.435,0.549,21.708,--,1.429,304.904,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 15 qubits and --max-metric-qubits is 14.
+100,50,5,amplitude,compact,7,128,3.057,0.171,0.193,--,0.503,25.424,1,1,143,158,success,software-level observation; no quantum-advantage claim
+100,50,5,phase,sequential-index,7,128,3.785,1.495,4.212,--,5.67,48.853,3,9,479,530,success,software-level observation; no quantum-advantage claim
+100,50,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+100,50,5,basis,entity-predicate-object,15,32768,3.171,0.287,23.5,--,1.424,339.681,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 15 qubits and --max-metric-qubits is 14.
+100,50,5,amplitude,compact,7,128,4.397,0.161,0.203,--,0.495,27.401,1,1,143,158,success,software-level observation; no quantum-advantage claim
+100,50,5,phase,sequential-index,7,128,4.044,1.357,3.687,--,5.386,43.662,3,9,479,530,success,software-level observation; no quantum-advantage claim
+100,50,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+100,50,5,basis,entity-predicate-object,15,32768,3.063,0.27,21.788,--,2.207,319.506,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 15 qubits and --max-metric-qubits is 14.
+100,50,5,amplitude,compact,7,128,4.14,0.152,0.185,--,0.793,32.447,1,1,143,158,success,software-level observation; no quantum-advantage claim
+100,50,5,phase,sequential-index,7,128,3.559,1.396,3.54,--,5.844,44.03,3,9,479,530,success,software-level observation; no quantum-advantage claim
+100,50,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+250,125,5,basis,entity-predicate-object,17,131072,8.064,0.649,84.023,--,5.031,1382.507,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 17 qubits and --max-metric-qubits is 14.
+250,125,5,amplitude,compact,8,256,7.685,0.206,0.271,--,1.408,70.6,1,1,431,446,success,software-level observation; no quantum-advantage claim
+250,125,5,phase,sequential-index,8,256,9.029,3.811,34.767,--,55.938,202.689,3,10,1271,1350,success,software-level observation; no quantum-advantage claim
+250,125,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+250,125,5,basis,entity-predicate-object,17,131072,7.077,0.676,84.043,--,5.233,1467.743,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 17 qubits and --max-metric-qubits is 14.
+250,125,5,amplitude,compact,8,256,7.719,0.215,0.278,--,1.444,65.813,1,1,431,446,success,software-level observation; no quantum-advantage claim
+250,125,5,phase,sequential-index,8,256,6.944,3.676,32.481,--,52.014,187.335,3,10,1271,1350,success,software-level observation; no quantum-advantage claim
+250,125,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+250,125,5,basis,entity-predicate-object,17,131072,6.426,1.736,94.892,--,7.825,1524.993,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 17 qubits and --max-metric-qubits is 14.
+250,125,5,amplitude,compact,8,256,6.281,1.874,0.287,--,1.43,66.102,1,1,431,446,success,software-level observation; no quantum-advantage claim
+250,125,5,phase,sequential-index,8,256,7.764,4.048,37.348,--,57.03,204.488,3,10,1271,1350,success,software-level observation; no quantum-advantage claim
+250,125,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+500,250,5,basis,entity-predicate-object,19,524288,19.669,1.686,351.737,--,15.449,6512.041,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 19 qubits and --max-metric-qubits is 14.
+500,250,5,amplitude,compact,9,512,19.482,0.406,0.441,--,3.019,121.402,1,1,684,702,success,software-level observation; no quantum-advantage claim
+500,250,5,phase,sequential-index,9,512,15.233,8.69,460.812,--,628.323,1449.167,3,11,2593,2724,success,software-level observation; no quantum-advantage claim
+500,250,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+500,250,5,basis,entity-predicate-object,19,524288,12.383,1.434,361.603,--,18.296,6751.004,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 19 qubits and --max-metric-qubits is 14.
+500,250,5,amplitude,compact,9,512,21.293,0.405,0.447,--,2.842,143.251,1,1,684,702,success,software-level observation; no quantum-advantage claim
+500,250,5,phase,sequential-index,9,512,11.749,6.513,464.78,--,614.52,1429.023,3,11,2593,2724,success,software-level observation; no quantum-advantage claim
+500,250,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+500,250,5,basis,entity-predicate-object,19,524288,14.051,1.325,378.403,--,14.869,6688.435,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 19 qubits and --max-metric-qubits is 14.
+500,250,5,amplitude,compact,9,512,23.612,0.409,0.454,--,2.726,126.526,1,1,684,702,success,software-level observation; no quantum-advantage claim
+500,250,5,phase,sequential-index,9,512,15.194,7.253,476.484,--,618.427,1463.462,3,11,2593,2724,success,software-level observation; no quantum-advantage claim
+500,250,5,combined,unsupported,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim

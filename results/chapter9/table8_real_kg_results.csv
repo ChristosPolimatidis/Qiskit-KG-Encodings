@@ -1,0 +1,17 @@
+dataset_name,triple_count,entity_count,predicate_count,encoding,qubits,dimension,preprocessing_time_ms,encoding_time_ms,circuit_construction_time_ms,transpilation_time_ms,simulation_time_ms,total_time_ms,circuit_depth,gate_count,transpiled_depth,transpiled_gate_count,status,notes
+exampleV3,129,71,16,basis,18,262144,4.906,0.351,191.171,--,5.474,3134.351,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 18 qubits and --max-metric-qubits is 14.
+exampleV3,129,71,16,amplitude,8,256,4.906,0.18,0.275,--,0.683,26.991,1,1,10,30,success,software-level observation; no quantum-advantage claim
+exampleV3,129,71,16,phase,8,256,4.906,3.067,35.23,--,54.079,158.873,3,10,979,1066,success,software-level observation; no quantum-advantage claim
+exampleV3,129,71,16,combined,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+productsSmall,129,71,16,basis,18,262144,7.524,0.358,181.031,--,5.887,3109.888,1,1,--,--,success,software-level observation; no quantum-advantage claim; Transpiled metrics skipped because the circuit has 18 qubits and --max-metric-qubits is 14.
+productsSmall,129,71,16,amplitude,8,256,7.524,0.188,0.278,--,0.746,33.124,1,1,10,30,success,software-level observation; no quantum-advantage claim
+productsSmall,129,71,16,phase,8,256,7.524,2.07,32.42,--,53.442,154.533,3,10,979,1066,success,software-level observation; no quantum-advantage claim
+productsSmall,129,71,16,combined,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+DecodedOntologies_V2,500,445,5,basis,21,2097152,90.62,1.314,1485.377,--,37.438,31242.534,1,1,--,--,success,software-level observation; no quantum-advantage claim; deterministically truncated from 3871 triples to 500; Transpiled metrics skipped because the circuit has 21 qubits and --max-metric-qubits is 14.
+DecodedOntologies_V2,500,445,5,amplitude,9,512,90.62,0.411,0.442,--,2.776,223.324,1,1,684,702,success,software-level observation; no quantum-advantage claim; deterministically truncated from 3871 triples to 500
+DecodedOntologies_V2,500,445,5,phase,9,512,90.62,7.143,468.162,--,621.925,1503.799,3,11,2883,3019,success,software-level observation; no quantum-advantage claim; deterministically truncated from 3871 triples to 500
+DecodedOntologies_V2,500,445,5,combined,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim
+Aristotle,8,10,3,basis,10,1024,1.363,0.031,0.768,--,0.217,257.58,1,1,2028,2046,success,software-level observation; no quantum-advantage claim
+Aristotle,8,10,3,amplitude,3,8,1.363,0.072,0.08,--,0.081,4.729,1,1,2,6,success,software-level observation; no quantum-advantage claim
+Aristotle,8,10,3,phase,3,8,1.363,0.17,0.182,--,0.62,6.255,3,5,11,20,success,software-level observation; no quantum-advantage claim
+Aristotle,8,10,3,combined,--,--,--,--,--,--,--,--,--,--,--,--,skipped,Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim

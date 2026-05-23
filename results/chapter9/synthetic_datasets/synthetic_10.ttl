@@ -1,0 +1,12 @@
+@prefix ex: <http://example.org/> .
+
+ex:e0 ex:p0 ex:e1 .
+ex:e1 ex:p1 ex:e2 .
+ex:e2 ex:p2 ex:e3 .
+ex:e3 ex:p3 ex:e4 .
+ex:e4 ex:p4 ex:e0 .
+ex:e0 ex:p0 ex:e2 .
+ex:e1 ex:p1 ex:e3 .
+ex:e2 ex:p2 ex:e4 .
+ex:e3 ex:p3 ex:e0 .
+ex:e4 ex:p4 ex:e1 .

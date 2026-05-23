@@ -1,6 +1,6 @@
 {
-  "timestamp_utc": "2026-05-23T18:00:59+00:00",
-  "created_at_utc": "2026-05-23T18:00:59+00:00",
+  "timestamp_utc": "2026-05-23T21:12:27+00:00",
+  "created_at_utc": "2026-05-23T21:12:27+00:00",
   "python_version": "3.13.5",
   "python": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
   "operating_system": {
@@ -32,29 +32,309 @@
   },
   "script": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\scripts\\run_chapter9_experiments.py",
   "repository_root": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings",
+  "exact_command_line": [
+    "C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "scripts/run_chapter9_experiments.py",
+    "--shots",
+    "2048",
+    "--repetitions",
+    "5",
+    "--index-mode",
+    "paper",
+    "--include-synthetic",
+    "--synthetic-sizes",
+    "6",
+    "10",
+    "25",
+    "50",
+    "100",
+    "250",
+    "500",
+    "--synthetic-repetitions",
+    "3",
+    "--include-real",
+    "--max-real-triples",
+    "500",
+    "--output-dir",
+    "results/chapter9"
+  ],
   "command_line_arguments": {
     "shots": 2048,
-    "repetitions": 3,
+    "repetitions": 5,
     "index_mode": "paper",
     "output_dir": "results/chapter9",
     "backend": "aer_simulator",
     "seed": 12345,
     "include_combined": true,
     "save_json": true,
-    "save_csv": true
+    "save_csv": true,
+    "include_synthetic": true,
+    "synthetic_sizes": [
+      6,
+      10,
+      25,
+      50,
+      100,
+      250,
+      500
+    ],
+    "synthetic_repetitions": 3,
+    "include_real": true,
+    "real_kg_files": null,
+    "max_real_triples": 500
   },
   "arguments": {
     "shots": 2048,
-    "repetitions": 3,
+    "repetitions": 5,
     "index_mode": "paper",
     "output_dir": "results/chapter9",
     "backend": "aer_simulator",
     "seed": 12345,
     "include_combined": true,
     "save_json": true,
-    "save_csv": true
+    "save_csv": true,
+    "include_synthetic": true,
+    "synthetic_sizes": [
+      6,
+      10,
+      25,
+      50,
+      100,
+      250,
+      500
+    ],
+    "synthetic_repetitions": 3,
+    "include_real": true,
+    "real_kg_files": null,
+    "max_real_triples": 500
   },
   "random_seed": 12345,
-  "git_commit_hash": "261450b324b1482fbbc6592c041d1ad67d41d68c",
-  "note": "This runner only executes Chapter 9 six-triple running-example experiments. It does not call the old scalability runners."
+  "git_commit_hash": "bdd5c6ba16bf4450bafb18797a11d0e6c16163a1",
+  "generated_tables": [
+    "results\\chapter9\\table3_encoding_process.csv",
+    "results\\chapter9\\table3_encoding_process.tex",
+    "results\\chapter9\\table4_usage_tasks.csv",
+    "results\\chapter9\\table4_usage_tasks.tex",
+    "results\\chapter9\\table6_circuit_statistics.csv",
+    "results\\chapter9\\table6_circuit_statistics.tex",
+    "results\\chapter9\\table7_synthetic_results.csv",
+    "results\\chapter9\\table7_synthetic_results.tex",
+    "results\\chapter9\\table8_real_kg_results.csv",
+    "results\\chapter9\\table8_real_kg_results.tex"
+  ],
+  "generated_plots": [
+    "results\\chapter9\\figures\\table3_encoding_process_runtime.png",
+    "results\\chapter9\\figures\\table4_usage_task_runtime.png",
+    "results\\chapter9\\figures\\table3_encoding_time_bar.png",
+    "results\\chapter9\\figures\\table3_qubits_bar.png",
+    "results\\chapter9\\figures\\table4_task_time_bar.png",
+    "results\\chapter9\\figures\\amplitude_probabilities.png",
+    "results\\chapter9\\figures\\combined_magnitude_phase.png",
+    "results\\chapter9\\figures\\synthetic_encoding_time.png",
+    "results\\chapter9\\figures\\synthetic_qubits.png",
+    "results\\chapter9\\figures\\synthetic_depth.png",
+    "results\\chapter9\\figures\\synthetic_total_time.png"
+  ],
+  "generated_data_files": [
+    "results\\chapter9\\chapter9_raw_results.json",
+    "results\\chapter9\\synthetic_raw_results.json",
+    "results\\chapter9\\real_kg_raw_results.json",
+    "results\\chapter9\\environment.json",
+    "results\\chapter9\\RUN_SUMMARY.md"
+  ],
+  "synthetic_sizes_used": [
+    6,
+    10,
+    25,
+    50,
+    100,
+    250,
+    500
+  ],
+  "real_kg_files_used": [
+    "data\\real_kgs\\exampleV3.ttl",
+    "data\\real_kgs\\productsSmall.rdf",
+    "data\\real_kgs\\DecodedOntologies_V2.ttl",
+    "data\\real_kgs\\Aristotle.xml"
+  ],
+  "skipped_or_failed_experiments": [
+    {
+      "section": "synthetic_observations",
+      "dataset": 6,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 6,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 6,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 10,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 10,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 10,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 25,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 25,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 25,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 50,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 50,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 50,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 100,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 100,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 100,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 250,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 250,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 250,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 500,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 500,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "synthetic_observations",
+      "dataset": 500,
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined synthetic scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "real_kg_observations",
+      "dataset": "exampleV3",
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "real_kg_observations",
+      "dataset": "productsSmall",
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "real_kg_observations",
+      "dataset": "DecodedOntologies_V2",
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    },
+    {
+      "section": "real_kg_observations",
+      "dataset": "Aristotle",
+      "encoding": "combined",
+      "status": "skipped",
+      "reason": "Combined real-KG scaling is not supported by the existing scalability runner; skipped. software-level observation; no quantum-advantage claim"
+    }
+  ],
+  "run_summary": "results\\chapter9\\RUN_SUMMARY.md",
+  "software_level_observation_note": "Results are simulator-based software-level observations and do not show quantum advantage.",
+  "note": "By default this runner executes the Chapter 9 six-triple running-example experiments. Optional --include-synthetic and --include-real runs add Chapter 9 software-level observations using the existing scalability helpers."
 }

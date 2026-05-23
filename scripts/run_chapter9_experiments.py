@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from collections import Counter
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 import importlib.metadata
@@ -23,8 +24,10 @@ from qiskit_aer import AerSimulator
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+SCRIPTS_DIR = Path(__file__).resolve().parent
+for path in (REPO_ROOT, SCRIPTS_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 from src.amplitude_encoding import (
     build_amplitude_encoding_artifacts,
@@ -103,6 +106,74 @@ TABLE6_CIRCUIT_FIELDS = [
     "Repetitions",
 ]
 
+SYNTHETIC_ENCODINGS = ("basis", "amplitude", "phase", "combined")
+DEFAULT_SYNTHETIC_SIZES = (6, 10, 25, 50, 100, 250, 500)
+
+SYNTHETIC_TABLE_FIELDS = [
+    "triple_count",
+    "entity_count",
+    "predicate_count",
+    "encoding",
+    "index_mode",
+    "qubits",
+    "dimension",
+    "preprocessing_time_ms",
+    "encoding_time_ms",
+    "circuit_construction_time_ms",
+    "transpilation_time_ms",
+    "simulation_time_ms",
+    "total_time_ms",
+    "circuit_depth",
+    "gate_count",
+    "transpiled_depth",
+    "transpiled_gate_count",
+    "status",
+    "notes",
+]
+
+SYNTHETIC_LATEX_FIELDS = [
+    "Triples",
+    "Encoding",
+    "Qubits",
+    "Enc. Time",
+    "Depth",
+    "Sim. Time",
+    "Status",
+]
+
+REAL_TABLE_FIELDS = [
+    "dataset_name",
+    "triple_count",
+    "entity_count",
+    "predicate_count",
+    "encoding",
+    "qubits",
+    "dimension",
+    "preprocessing_time_ms",
+    "encoding_time_ms",
+    "circuit_construction_time_ms",
+    "transpilation_time_ms",
+    "simulation_time_ms",
+    "total_time_ms",
+    "circuit_depth",
+    "gate_count",
+    "transpiled_depth",
+    "transpiled_gate_count",
+    "status",
+    "notes",
+]
+
+REAL_LATEX_FIELDS = [
+    "Dataset",
+    "Triples",
+    "Entities",
+    "Predicates",
+    "Encoding",
+    "Qubits",
+    "Enc. Time",
+    "Status",
+]
+
 TABLE1_TASK_ORDER = [
     "search_grover_lookup",
     "entity_matching_swap_test",
@@ -130,6 +201,12 @@ TABLE1_TASK_LABELS = {
 
 def utc_timestamp() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def timed_call(function, *args, **kwargs) -> tuple[Any, float]:
+    start_time = time.perf_counter()
+    result = function(*args, **kwargs)
+    return result, time.perf_counter() - start_time
 
 
 def package_version(package: str) -> str:
@@ -880,6 +957,40 @@ def shots_or_zero(value: Any) -> str:
     return formatted if formatted else "0"
 
 
+def seconds_value(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def seconds_to_ms_value(value: Any) -> str:
+    seconds = seconds_value(value)
+    if seconds is None:
+        return "--"
+    return number_or_blank(seconds * 1000, digits=3)
+
+
+def sum_seconds_to_ms(*values: Any) -> str:
+    numeric_values = [seconds_value(value) for value in values]
+    present_values = [value for value in numeric_values if value is not None]
+    if not present_values:
+        return "--"
+    return number_or_blank(sum(present_values) * 1000, digits=3)
+
+
+def power_of_two_dimension(qubits: Any) -> str:
+    if qubits in (None, ""):
+        return "--"
+    try:
+        qubit_count = int(float(qubits))
+    except (TypeError, ValueError):
+        return "--"
+    return str(2**qubit_count)
+
+
 def compact_note(note: Any, max_length: int = 72) -> str:
     text = str(note or "")
     if len(text) <= max_length:
@@ -989,6 +1100,739 @@ def circuit_statistics_table_rows(
     return rows
 
 
+def synthetic_dataset_config(size: int) -> tuple[int, int, int]:
+    """Use the existing scaling config when present, else the same generator shape."""
+
+    from generate_scaling_datasets import DATASET_CONFIGS
+
+    if size in DATASET_CONFIGS:
+        return DATASET_CONFIGS[size]
+    entity_count = max(2, size // 2)
+    predicate_count = max(1, min(5, size))
+    return size, entity_count, predicate_count
+
+
+def scaling_args_for_chapter9(
+    args: argparse.Namespace,
+    *,
+    dataset_category: str = "synthetic",
+) -> argparse.Namespace:
+    is_synthetic = dataset_category == "synthetic"
+    return argparse.Namespace(
+        shots=args.shots,
+        rdf_format="turtle" if is_synthetic else None,
+        weight_strategy="uniform",
+        phase_marker_mode="synthetic-default" if is_synthetic else "most-common-predicate",
+        phase_mark_predicate=None,
+        phase_angle=math.pi,
+        max_basis_simulation_qubits=22,
+        max_phase_diagonal_qubits=10,
+        max_metric_qubits=14,
+        decompose_reps=1,
+        compute_decomposed_metrics=False,
+        compute_transpiled_metrics=True,
+    )
+
+
+def synthetic_index_mode_for_encoding(encoding: str) -> str:
+    return {
+        "basis": "entity-predicate-object",
+        "amplitude": "compact",
+        "phase": "sequential-index",
+        "combined": "unsupported",
+    }.get(encoding, "--")
+
+
+def synthetic_notes_from_scaling_row(row: dict[str, Any]) -> str:
+    notes = ["software-level observation; no quantum-advantage claim"]
+    for field in ("error_message", "phase_warning", "metric_error"):
+        value = row.get(field)
+        if value not in (None, ""):
+            notes.append(str(value))
+    return "; ".join(notes)
+
+
+def real_notes_from_scaling_row(
+    row: dict[str, Any],
+    *,
+    original_triple_count: int,
+    max_real_triples: int,
+) -> str:
+    notes = ["software-level observation; no quantum-advantage claim"]
+    if original_triple_count > max_real_triples:
+        notes.append(
+            f"deterministically truncated from {original_triple_count} triples "
+            f"to {max_real_triples}"
+        )
+    for field in ("error_message", "phase_warning", "metric_error"):
+        value = row.get(field)
+        if value not in (None, ""):
+            notes.append(str(value))
+    return "; ".join(notes)
+
+
+def synthetic_table_row_from_scaling_row(
+    row: dict[str, Any],
+    *,
+    encoding: str,
+    triple_count: int,
+    entity_count: int,
+    predicate_count: int,
+) -> dict[str, Any]:
+    qubits = number_or_dash(row.get("qubits"))
+    status = str(row.get("status") or "unknown")
+    return {
+        "triple_count": triple_count,
+        "entity_count": entity_count,
+        "predicate_count": predicate_count,
+        "encoding": encoding,
+        "index_mode": synthetic_index_mode_for_encoding(encoding),
+        "qubits": qubits,
+        "dimension": power_of_two_dimension(row.get("qubits")),
+        "preprocessing_time_ms": sum_seconds_to_ms(
+            row.get("rdf_parse_time"),
+            row.get("id_mapping_time"),
+        ),
+        "encoding_time_ms": seconds_to_ms_value(row.get("state_preparation_time")),
+        "circuit_construction_time_ms": seconds_to_ms_value(
+            row.get("circuit_construction_time")
+        ),
+        "transpilation_time_ms": "--",
+        "simulation_time_ms": seconds_to_ms_value(row.get("simulation_time")),
+        "total_time_ms": seconds_to_ms_value(row.get("total_runtime")),
+        "circuit_depth": number_or_dash(row.get("circuit_depth")),
+        "gate_count": number_or_dash(row.get("gate_count")),
+        "transpiled_depth": number_or_dash(row.get("transpiled_circuit_depth")),
+        "transpiled_gate_count": number_or_dash(row.get("transpiled_gate_count")),
+        "status": status,
+        "notes": synthetic_notes_from_scaling_row(row),
+    }
+
+
+def synthetic_skip_row(
+    *,
+    encoding: str,
+    triple_count: int,
+    entity_count: int,
+    predicate_count: int,
+    notes: str,
+) -> dict[str, Any]:
+    return {
+        "triple_count": triple_count,
+        "entity_count": entity_count,
+        "predicate_count": predicate_count,
+        "encoding": encoding,
+        "index_mode": synthetic_index_mode_for_encoding(encoding),
+        "qubits": "--",
+        "dimension": "--",
+        "preprocessing_time_ms": "--",
+        "encoding_time_ms": "--",
+        "circuit_construction_time_ms": "--",
+        "transpilation_time_ms": "--",
+        "simulation_time_ms": "--",
+        "total_time_ms": "--",
+        "circuit_depth": "--",
+        "gate_count": "--",
+        "transpiled_depth": "--",
+        "transpiled_gate_count": "--",
+        "status": "skipped",
+        "notes": notes,
+    }
+
+
+def run_chapter9_synthetic_experiments(
+    args: argparse.Namespace,
+    output_dir: Path,
+) -> dict[str, Any]:
+    from generate_scaling_datasets import generate_dataset
+    from run_scaling_experiments import run_one_configuration
+
+    scaling_args = scaling_args_for_chapter9(args)
+    dataset_dir = output_dir / "synthetic_datasets"
+    table_rows: list[dict[str, Any]] = []
+    raw_scaling_rows: list[dict[str, Any]] = []
+
+    for size in args.synthetic_sizes:
+        triple_count, entity_count, predicate_count = synthetic_dataset_config(size)
+        dataset_path = dataset_dir / f"synthetic_{size}.ttl"
+        generate_dataset(
+            output_path=dataset_path,
+            triple_count=triple_count,
+            entity_count=entity_count,
+            predicate_count=predicate_count,
+        )
+
+        for repetition in range(1, args.synthetic_repetitions + 1):
+            for encoding in SYNTHETIC_ENCODINGS:
+                if encoding == "combined":
+                    table_rows.append(
+                        synthetic_skip_row(
+                            encoding=encoding,
+                            triple_count=triple_count,
+                            entity_count=entity_count,
+                            predicate_count=predicate_count,
+                            notes=(
+                                "Combined synthetic scaling is not supported by the "
+                                "existing scalability runner; skipped. "
+                                "software-level observation; no quantum-advantage claim"
+                            ),
+                        )
+                    )
+                    continue
+
+                scaling_row = run_one_configuration(
+                    dataset_path=dataset_path,
+                    dataset_category="synthetic",
+                    encoding=encoding,
+                    repetition=repetition,
+                    args=scaling_args,
+                    dataset_size=triple_count,
+                )
+                raw_scaling_rows.append(scaling_row)
+                table_rows.append(
+                    synthetic_table_row_from_scaling_row(
+                        scaling_row,
+                        encoding=encoding,
+                        triple_count=triple_count,
+                        entity_count=entity_count,
+                        predicate_count=predicate_count,
+                    )
+                )
+
+    return {
+        "settings": {
+            "sizes": list(args.synthetic_sizes),
+            "repetitions": args.synthetic_repetitions,
+            "encodings": list(SYNTHETIC_ENCODINGS),
+            "label": "software-level observations; no quantum-advantage claim",
+        },
+        "rows": table_rows,
+        "raw_scaling_rows": raw_scaling_rows,
+    }
+
+
+def resolve_real_kg_paths(file_args: list[str] | None) -> list[Path]:
+    from run_scaling_experiments import DEFAULT_REAL_KG_DIR, REAL_KG_FILES
+
+    if not file_args:
+        return [DEFAULT_REAL_KG_DIR / filename for filename in REAL_KG_FILES]
+
+    paths: list[Path] = []
+    for value in file_args:
+        path = Path(value)
+        candidates = [path]
+        if not path.is_absolute():
+            candidates.extend(
+                [
+                    REPO_ROOT / path,
+                    DEFAULT_REAL_KG_DIR / path,
+                ]
+            )
+        selected = next((candidate for candidate in candidates if candidate.exists()), path)
+        paths.append(selected)
+    return paths
+
+
+def real_table_row_from_scaling_row(
+    row: dict[str, Any],
+    *,
+    dataset_name: str,
+    triple_count: int | str,
+    entity_count: int | str,
+    predicate_count: int | str,
+    encoding: str,
+    original_triple_count: int,
+    max_real_triples: int,
+) -> dict[str, Any]:
+    return {
+        "dataset_name": dataset_name,
+        "triple_count": triple_count,
+        "entity_count": entity_count,
+        "predicate_count": predicate_count,
+        "encoding": encoding,
+        "qubits": number_or_dash(row.get("qubits")),
+        "dimension": power_of_two_dimension(row.get("qubits")),
+        "preprocessing_time_ms": sum_seconds_to_ms(
+            row.get("rdf_parse_time"),
+            row.get("id_mapping_time"),
+        ),
+        "encoding_time_ms": seconds_to_ms_value(row.get("state_preparation_time")),
+        "circuit_construction_time_ms": seconds_to_ms_value(
+            row.get("circuit_construction_time")
+        ),
+        "transpilation_time_ms": "--",
+        "simulation_time_ms": seconds_to_ms_value(row.get("simulation_time")),
+        "total_time_ms": seconds_to_ms_value(row.get("total_runtime")),
+        "circuit_depth": number_or_dash(row.get("circuit_depth")),
+        "gate_count": number_or_dash(row.get("gate_count")),
+        "transpiled_depth": number_or_dash(row.get("transpiled_circuit_depth")),
+        "transpiled_gate_count": number_or_dash(row.get("transpiled_gate_count")),
+        "status": str(row.get("status") or "unknown"),
+        "notes": real_notes_from_scaling_row(
+            row,
+            original_triple_count=original_triple_count,
+            max_real_triples=max_real_triples,
+        ),
+    }
+
+
+def real_skip_row(
+    *,
+    dataset_name: str,
+    triple_count: int | str,
+    entity_count: int | str,
+    predicate_count: int | str,
+    encoding: str,
+    status: str,
+    notes: str,
+) -> dict[str, Any]:
+    return {
+        "dataset_name": dataset_name,
+        "triple_count": triple_count,
+        "entity_count": entity_count,
+        "predicate_count": predicate_count,
+        "encoding": encoding,
+        "qubits": "--",
+        "dimension": "--",
+        "preprocessing_time_ms": "--",
+        "encoding_time_ms": "--",
+        "circuit_construction_time_ms": "--",
+        "transpilation_time_ms": "--",
+        "simulation_time_ms": "--",
+        "total_time_ms": "--",
+        "circuit_depth": "--",
+        "gate_count": "--",
+        "transpiled_depth": "--",
+        "transpiled_gate_count": "--",
+        "status": status,
+        "notes": notes,
+    }
+
+
+def run_real_encoding_observation(
+    *,
+    dataset_path: Path,
+    dataset_name: str,
+    encoding: str,
+    context: Any,
+    parse_elapsed: float,
+    mapping_elapsed: float,
+    original_triple_count: int,
+    args: argparse.Namespace,
+    scaling_args: argparse.Namespace,
+) -> dict[str, Any]:
+    from run_scaling_experiments import (
+        SimulatorLimitError,
+        apply_runtime_settings,
+        empty_row,
+        rounded_seconds,
+        run_amplitude_scaling,
+        run_basis_scaling,
+        run_phase_scaling,
+        update_context_metrics,
+        utc_timestamp as scaling_utc_timestamp,
+    )
+
+    row = empty_row(
+        dataset_path=dataset_path,
+        dataset_category="real",
+        encoding=encoding,
+        repetition=1,
+        shots=args.shots,
+        dataset_size=context.triple_count,
+    )
+    apply_runtime_settings(row, scaling_args)
+    row["rdf_parse_time"] = rounded_seconds(parse_elapsed)
+    row["id_mapping_time"] = rounded_seconds(mapping_elapsed)
+    row["original_triple_count"] = original_triple_count
+    update_context_metrics(row, context)
+    run_start = time.perf_counter()
+
+    try:
+        if encoding == "basis":
+            run_basis_scaling(row, context, scaling_args)
+        elif encoding == "amplitude":
+            run_amplitude_scaling(row, context, scaling_args)
+        elif encoding == "phase":
+            run_phase_scaling(row, context, scaling_args)
+        else:
+            raise ValueError(f"Unsupported encoding '{encoding}'.")
+        row["success"] = True
+        row["status"] = "success"
+    except SimulatorLimitError as exc:
+        row["success"] = False
+        row["status"] = "simulator_limit"
+        row["error_message"] = str(exc)
+    except Exception as exc:
+        row["success"] = False
+        row["status"] = "error"
+        row["error_message"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        total_elapsed = time.perf_counter() - run_start
+        preprocessing_elapsed = parse_elapsed + mapping_elapsed
+        row["total_runtime"] = rounded_seconds(preprocessing_elapsed + total_elapsed)
+        if row["success"]:
+            row["completed_total_runtime"] = row["total_runtime"]
+        row["finished_at_utc"] = scaling_utc_timestamp()
+        row["dataset_name"] = dataset_name
+
+    return row
+
+
+def run_chapter9_real_kg_experiments(
+    args: argparse.Namespace,
+) -> dict[str, Any]:
+    from src.id_mapper import build_encoding_context
+    from src.kg_parser import load_triples
+
+    scaling_args = scaling_args_for_chapter9(args, dataset_category="real")
+    table_rows: list[dict[str, Any]] = []
+    raw_scaling_rows: list[dict[str, Any]] = []
+    real_paths = resolve_real_kg_paths(args.real_kg_files)
+
+    for dataset_path in real_paths:
+        dataset_name = dataset_path.stem
+        if not dataset_path.exists():
+            note = (
+                f"Real KG file not found: {dataset_path}; "
+                "software-level observation; no quantum-advantage claim"
+            )
+            for encoding in SYNTHETIC_ENCODINGS:
+                table_rows.append(
+                    real_skip_row(
+                        dataset_name=dataset_name,
+                        triple_count="--",
+                        entity_count="--",
+                        predicate_count="--",
+                        encoding=encoding,
+                        status="skipped",
+                        notes=note,
+                    )
+                )
+            continue
+
+        try:
+            triples, parse_elapsed = timed_call(load_triples, dataset_path, None)
+            original_triple_count = len(triples)
+            truncated_triples = triples[: args.max_real_triples]
+            context, mapping_elapsed = timed_call(
+                build_encoding_context,
+                triples=truncated_triples,
+                fixed_thesis_mapping=False,
+                dataset_path=dataset_path,
+            )
+        except Exception as exc:
+            note = (
+                f"Could not parse/build context for {dataset_path}: "
+                f"{type(exc).__name__}: {exc}; software-level observation; "
+                "no quantum-advantage claim"
+            )
+            for encoding in SYNTHETIC_ENCODINGS:
+                table_rows.append(
+                    real_skip_row(
+                        dataset_name=dataset_name,
+                        triple_count="--",
+                        entity_count="--",
+                        predicate_count="--",
+                        encoding=encoding,
+                        status="parse_error",
+                        notes=note,
+                    )
+                )
+            continue
+
+        for encoding in SYNTHETIC_ENCODINGS:
+            if encoding == "combined":
+                table_rows.append(
+                    real_skip_row(
+                        dataset_name=dataset_name,
+                        triple_count=context.triple_count,
+                        entity_count=context.entity_count,
+                        predicate_count=context.predicate_count,
+                        encoding=encoding,
+                        status="skipped",
+                        notes=(
+                            "Combined real-KG scaling is not supported by the "
+                            "existing scalability runner; skipped. "
+                            "software-level observation; no quantum-advantage claim"
+                        ),
+                    )
+                )
+                continue
+
+            scaling_row = run_real_encoding_observation(
+                dataset_path=dataset_path,
+                dataset_name=dataset_name,
+                encoding=encoding,
+                context=context,
+                parse_elapsed=parse_elapsed,
+                mapping_elapsed=mapping_elapsed,
+                original_triple_count=original_triple_count,
+                args=args,
+                scaling_args=scaling_args,
+            )
+            raw_scaling_rows.append(scaling_row)
+            table_rows.append(
+                real_table_row_from_scaling_row(
+                    scaling_row,
+                    dataset_name=dataset_name,
+                    triple_count=context.triple_count,
+                    entity_count=context.entity_count,
+                    predicate_count=context.predicate_count,
+                    encoding=encoding,
+                    original_triple_count=original_triple_count,
+                    max_real_triples=args.max_real_triples,
+                )
+            )
+
+    return {
+        "settings": {
+            "files": [str(path) for path in real_paths],
+            "max_real_triples": args.max_real_triples,
+            "encodings": list(SYNTHETIC_ENCODINGS),
+            "label": "software-level observations; no quantum-advantage claim",
+        },
+        "rows": table_rows,
+        "raw_scaling_rows": raw_scaling_rows,
+    }
+
+
+def mean_numeric_string(rows: list[dict[str, Any]], field: str) -> str:
+    values: list[float] = []
+    for row in rows:
+        value = row.get(field)
+        if value in (None, "", "--"):
+            continue
+        try:
+            values.append(float(value))
+        except (TypeError, ValueError):
+            continue
+    if not values:
+        return "--"
+    return number_or_blank(statistics.mean(values), digits=3)
+
+
+def status_summary(rows: list[dict[str, Any]]) -> str:
+    counts = Counter(str(row.get("status") or "unknown") for row in rows)
+    if len(counts) == 1:
+        return next(iter(counts))
+    return "; ".join(f"{status}:{count}" for status, count in sorted(counts.items()))
+
+
+def synthetic_latex_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, str]]:
+    groups: dict[tuple[int, str], list[dict[str, Any]]] = {}
+    for row in rows:
+        key = (int(row["triple_count"]), str(row["encoding"]))
+        groups.setdefault(key, []).append(row)
+
+    compact_rows: list[dict[str, str]] = []
+    for (triple_count, encoding), group in sorted(groups.items()):
+        compact_rows.append(
+            {
+                "Triples": str(triple_count),
+                "Encoding": encoding,
+                "Qubits": mean_numeric_string(group, "qubits"),
+                "Enc. Time": mean_numeric_string(group, "encoding_time_ms"),
+                "Depth": mean_numeric_string(group, "circuit_depth"),
+                "Sim. Time": mean_numeric_string(group, "simulation_time_ms"),
+                "Status": status_summary(group),
+            }
+        )
+    return compact_rows
+
+
+def real_latex_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, str]]:
+    compact_rows: list[dict[str, str]] = []
+    for row in rows:
+        compact_rows.append(
+            {
+                "Dataset": str(row.get("dataset_name") or ""),
+                "Triples": str(row.get("triple_count") or "--"),
+                "Entities": str(row.get("entity_count") or "--"),
+                "Predicates": str(row.get("predicate_count") or "--"),
+                "Encoding": str(row.get("encoding") or ""),
+                "Qubits": str(row.get("qubits") or "--"),
+                "Enc. Time": str(row.get("encoding_time_ms") or "--"),
+                "Status": str(row.get("status") or "--"),
+            }
+        )
+    return compact_rows
+
+
+def numeric_table_value(value: Any) -> float | None:
+    if value in (None, "", "--"):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def synthetic_plot_points(
+    rows: list[dict[str, Any]],
+    metric_field: str,
+) -> dict[str, list[tuple[float, float]]]:
+    grouped: dict[tuple[str, int], list[float]] = {}
+    for row in rows:
+        x_value = numeric_table_value(row.get("triple_count"))
+        y_value = numeric_table_value(row.get(metric_field))
+        encoding = str(row.get("encoding") or "")
+        if x_value is None or y_value is None or not encoding:
+            continue
+        grouped.setdefault((encoding, int(x_value)), []).append(y_value)
+
+    points_by_encoding: dict[str, list[tuple[float, float]]] = {}
+    for (encoding, triple_count), values in grouped.items():
+        points_by_encoding.setdefault(encoding, []).append(
+            (float(triple_count), statistics.mean(values))
+        )
+    return {
+        encoding: sorted(points, key=lambda item: item[0])
+        for encoding, points in sorted(points_by_encoding.items())
+    }
+
+
+def write_synthetic_observation_plots(
+    rows: list[dict[str, Any]],
+    figures_dir: Path,
+) -> list[Path]:
+    if not rows:
+        return []
+
+    try:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import matplotlib.ticker as mticker
+        from run_scaling_experiments import (
+            AXIS_BACKGROUND,
+            ENCODING_COLORS,
+            ENCODING_MARKERS,
+            GRID_COLOR,
+            PLOT_BACKGROUND,
+            compact_number,
+            pretty_label,
+        )
+    except Exception:
+        return []
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    created: list[Path] = []
+    plot_specs = [
+        (
+            "encoding_time_ms",
+            "Encoding time (ms)",
+            "Section 9.2 Synthetic Encoding Time",
+            "synthetic_encoding_time.png",
+        ),
+        (
+            "qubits",
+            "Qubits",
+            "Section 9.2 Synthetic Qubits",
+            "synthetic_qubits.png",
+        ),
+        (
+            "circuit_depth",
+            "Circuit depth",
+            "Section 9.2 Synthetic Circuit Depth",
+            "synthetic_depth.png",
+        ),
+        (
+            "total_time_ms",
+            "Total time (ms)",
+            "Section 9.2 Synthetic Total Time",
+            "synthetic_total_time.png",
+        ),
+    ]
+
+    for metric_field, ylabel, title, filename in plot_specs:
+        points_by_encoding = synthetic_plot_points(rows, metric_field)
+        if not points_by_encoding:
+            continue
+
+        fig, ax = plt.subplots(figsize=(9.4, 5.4))
+        fig.patch.set_facecolor(PLOT_BACKGROUND)
+        ax.set_facecolor(AXIS_BACKGROUND)
+        plotted_values: list[float] = []
+
+        for encoding, points in points_by_encoding.items():
+            x_values = [point[0] for point in points]
+            y_values = [point[1] for point in points]
+            plotted_values.extend(y_values)
+            ax.plot(
+                x_values,
+                y_values,
+                marker=ENCODING_MARKERS.get(encoding, "o"),
+                markersize=7.8,
+                markeredgecolor="white",
+                markeredgewidth=1.2,
+                color=ENCODING_COLORS.get(encoding),
+                linewidth=2.4,
+                label=pretty_label(encoding),
+            )
+
+        x_ticks = sorted(
+            {
+                numeric_table_value(row.get("triple_count"))
+                for row in rows
+                if numeric_table_value(row.get("triple_count")) is not None
+            }
+        )
+        ax.set_xscale("log", base=10)
+        ax.set_xticks(x_ticks)
+        if len(x_ticks) == 1:
+            only_tick = x_ticks[0]
+            ax.set_xlim(only_tick / 1.6, only_tick * 1.6)
+        ax.get_xaxis().set_major_formatter(mticker.FuncFormatter(compact_number))
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(compact_number))
+        ax.set_xlabel("Number of triples")
+        ax.set_ylabel(ylabel)
+        if plotted_values and min(plotted_values) >= 0:
+            ax.set_ylim(bottom=0)
+        ax.set_title(title, loc="left", fontsize=15, fontweight="bold", pad=12)
+        ax.grid(
+            True,
+            which="major",
+            axis="both",
+            color=GRID_COLOR,
+            alpha=0.72,
+            linewidth=0.8,
+        )
+        ax.grid(
+            True,
+            which="minor",
+            axis="y",
+            color=GRID_COLOR,
+            alpha=0.25,
+            linewidth=0.45,
+        )
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_color("#9ca3af")
+        ax.spines["bottom"].set_color("#9ca3af")
+        ax.tick_params(colors="#1f2937", labelsize=10)
+        ax.legend(
+            title="Encoding",
+            loc="upper left",
+            bbox_to_anchor=(1.01, 1.0),
+            frameon=False,
+            borderaxespad=0,
+        )
+        fig.tight_layout()
+        output_path = figures_dir / filename
+        fig.savefig(
+            output_path,
+            dpi=240,
+            bbox_inches="tight",
+            facecolor=fig.get_facecolor(),
+        )
+        plt.close(fig)
+        created.append(output_path)
+
+    return created
+
+
 def write_csv(rows: list[dict[str, Any]], output_path: Path, fieldnames: list[str]) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as handle:
@@ -1080,12 +1924,112 @@ def write_json(payload: dict[str, Any], output_path: Path) -> None:
     )
 
 
-def environment_payload(args: argparse.Namespace) -> dict[str, Any]:
+def collect_generated_tables(output_files: dict[str, Any]) -> list[str]:
+    table_keys = [
+        "table3_encoding_process",
+        "table3_encoding_process_tex",
+        "table4_usage_tasks",
+        "table4_usage_tasks_tex",
+        "table6_circuit_statistics",
+        "table6_circuit_statistics_tex",
+        "table7_synthetic_results",
+        "table7_synthetic_results_tex",
+        "table8_real_kg_results",
+        "table8_real_kg_results_tex",
+    ]
+    return [
+        str(output_files[key])
+        for key in table_keys
+        if output_files.get(key) not in (None, "")
+    ]
+
+
+def collect_generated_plots(output_files: dict[str, Any]) -> list[str]:
+    return [
+        str(path)
+        for path in output_files.get("figures", [])
+        if path not in (None, "")
+    ]
+
+
+def collect_generated_data_files(output_files: dict[str, Any]) -> list[str]:
+    data_keys = [
+        "raw_results",
+        "synthetic_raw_results",
+        "real_kg_raw_results",
+        "environment",
+        "run_summary",
+    ]
+    return [
+        str(output_files[key])
+        for key in data_keys
+        if output_files.get(key) not in (None, "")
+    ]
+
+
+def collect_skipped_or_failed_experiments(
+    raw_payload: dict[str, Any],
+) -> list[dict[str, Any]]:
+    skipped_or_failed: list[dict[str, Any]] = []
+
+    for row in raw_payload.get("encoding_process_rows", []):
+        if row.get("status") != "success":
+            skipped_or_failed.append(
+                {
+                    "section": "encoding_process",
+                    "name": row.get("experiment"),
+                    "encoding": row.get("experiment"),
+                    "status": row.get("status"),
+                    "reason": row.get("notes") or row.get("error_message") or "",
+                }
+            )
+
+    for row in raw_payload.get("usage_task_rows", []):
+        if row.get("status") != "success":
+            skipped_or_failed.append(
+                {
+                    "section": "usage_task",
+                    "name": row.get("task"),
+                    "encoding": row.get("task"),
+                    "status": row.get("status"),
+                    "reason": row.get("notes") or row.get("error_message") or "",
+                }
+            )
+
+    for section, rows in (
+        ("synthetic_observations", raw_payload.get("table7_synthetic_results", [])),
+        ("real_kg_observations", raw_payload.get("table8_real_kg_results", [])),
+    ):
+        for row in rows:
+            if row.get("status") != "success":
+                skipped_or_failed.append(
+                    {
+                        "section": section,
+                        "dataset": row.get("dataset_name") or row.get("triple_count"),
+                        "encoding": row.get("encoding"),
+                        "status": row.get("status"),
+                        "reason": row.get("notes") or "",
+                    }
+                )
+
+    return skipped_or_failed
+
+
+def environment_payload(
+    args: argparse.Namespace,
+    *,
+    raw_payload: dict[str, Any] | None = None,
+    run_summary_path: Path | None = None,
+    command_line: list[str] | None = None,
+) -> dict[str, Any]:
     qiskit_version = package_version("qiskit")
     qiskit_aer_version = package_version("qiskit-aer")
     numpy_version = package_version("numpy")
     rdflib_version = package_version("rdflib")
     ram_bytes = total_ram_bytes()
+    output_files = raw_payload.get("output_files", {}) if raw_payload else {}
+    synthetic_payload = raw_payload.get("synthetic_observations") if raw_payload else None
+    real_payload = raw_payload.get("real_kg_observations") if raw_payload else None
     return {
         "timestamp_utc": utc_timestamp(),
         "created_at_utc": utc_timestamp(),
@@ -1115,13 +2059,39 @@ def environment_payload(args: argparse.Namespace) -> dict[str, Any]:
         },
         "script": str(Path(__file__).resolve()),
         "repository_root": str(REPO_ROOT),
+        "exact_command_line": command_line or sys.argv,
         "command_line_arguments": vars(args),
         "arguments": vars(args),
         "random_seed": args.seed,
         "git_commit_hash": git_commit_hash(),
+        "generated_tables": collect_generated_tables(output_files),
+        "generated_plots": collect_generated_plots(output_files),
+        "generated_data_files": collect_generated_data_files(output_files),
+        "synthetic_sizes_used": (
+            synthetic_payload.get("settings", {}).get("sizes", [])
+            if synthetic_payload
+            else []
+        ),
+        "real_kg_files_used": (
+            real_payload.get("settings", {}).get("files", [])
+            if real_payload
+            else []
+        ),
+        "skipped_or_failed_experiments": (
+            collect_skipped_or_failed_experiments(raw_payload)
+            if raw_payload
+            else []
+        ),
+        "run_summary": str(run_summary_path) if run_summary_path else None,
+        "software_level_observation_note": (
+            "Results are simulator-based software-level observations and do "
+            "not show quantum advantage."
+        ),
         "note": (
-            "This runner only executes Chapter 9 six-triple running-example "
-            "experiments. It does not call the old scalability runners."
+            "By default this runner executes the Chapter 9 six-triple "
+            "running-example experiments. Optional --include-synthetic and "
+            "--include-real runs add Chapter 9 software-level observations "
+            "using the existing scalability helpers."
         ),
     }
 
@@ -1140,6 +2110,138 @@ def machine_summary_line(payload: dict[str, Any]) -> str:
         f"{format_ram(payload.get('total_ram_bytes'))} | "
         f"Qiskit {payload.get('qiskit_version')} / Aer {payload.get('qiskit_aer_version')}"
     )
+
+
+def markdown_list(items: list[Any], empty_text: str = "None") -> list[str]:
+    if not items:
+        return [f"- {empty_text}"]
+    return [f"- {item}" for item in items]
+
+
+def skipped_failed_markdown(items: list[dict[str, Any]]) -> list[str]:
+    if not items:
+        return ["- None"]
+    grouped: dict[tuple[str, str | None, str, str], int] = {}
+    lines: list[str] = []
+    for item in items:
+        label = (
+            item.get("dataset")
+            or item.get("name")
+            or item.get("section")
+            or "experiment"
+        )
+        encoding = item.get("encoding")
+        status = item.get("status") or "unknown"
+        reason = item.get("reason") or "No reason recorded."
+        key = (
+            str(label),
+            str(encoding) if encoding else None,
+            str(status),
+            str(reason),
+        )
+        grouped[key] = grouped.get(key, 0) + 1
+    for (label, encoding, status, reason), count in grouped.items():
+        suffix = f" ({encoding})" if encoding else ""
+        count_suffix = f" ({count} rows)" if count > 1 else ""
+        lines.append(f"- {label}{suffix}: {status}{count_suffix}; {reason}")
+    return lines
+
+
+def write_run_summary(
+    *,
+    output_path: Path,
+    args: argparse.Namespace,
+    raw_payload: dict[str, Any],
+    environment: dict[str, Any],
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_files = raw_payload.get("output_files", {})
+    generated_tables = collect_generated_tables(output_files)
+    generated_plots = collect_generated_plots(output_files)
+    generated_data_files = collect_generated_data_files(output_files)
+    synthetic_payload = raw_payload.get("synthetic_observations")
+    real_payload = raw_payload.get("real_kg_observations")
+    skipped_or_failed = collect_skipped_or_failed_experiments(raw_payload)
+    os_payload = environment.get("operating_system") or {}
+    cpu_payload = environment.get("cpu") or {}
+
+    lines = [
+        "# Chapter 9 Run Summary",
+        "",
+        (
+            "Results are simulator-based software-level observations and do "
+            "not show quantum advantage."
+        ),
+        "",
+        "## Command",
+        "",
+        "```text",
+        " ".join(str(part) for part in environment.get("exact_command_line", [])),
+        "```",
+        "",
+        "## Command-Line Arguments",
+        "",
+    ]
+    for key, value in sorted(vars(args).items()):
+        lines.append(f"- `{key}`: `{value}`")
+
+    lines.extend(
+        [
+            "",
+            "## Generated Tables",
+            "",
+            *markdown_list(generated_tables),
+            "",
+            "## Generated Plots",
+            "",
+            *markdown_list(generated_plots),
+            "",
+            "## Generated Data Files",
+            "",
+            *markdown_list(generated_data_files),
+            "",
+            "## Section 9.2 Synthetic Sizes",
+            "",
+        ]
+    )
+    if synthetic_payload:
+        synthetic_sizes = synthetic_payload.get("settings", {}).get("sizes", [])
+        lines.extend(markdown_list([str(size) for size in synthetic_sizes]))
+    else:
+        lines.extend(markdown_list([], empty_text="Not run"))
+
+    lines.extend(["", "## Section 9.3 Real KG Files", ""])
+    if real_payload:
+        real_files = real_payload.get("settings", {}).get("files", [])
+        lines.extend(markdown_list(real_files))
+    else:
+        lines.extend(markdown_list([], empty_text="Not run"))
+
+    lines.extend(
+        [
+            "",
+            "## Skipped Or Failed Experiments",
+            "",
+            *skipped_failed_markdown(skipped_or_failed),
+            "",
+            "## Environment",
+            "",
+            f"- Timestamp UTC: `{environment.get('timestamp_utc')}`",
+            f"- Hostname: `{environment.get('hostname')}`",
+            f"- Python: `{environment.get('python_version')}`",
+            f"- Qiskit: `{environment.get('qiskit_version')}`",
+            f"- Qiskit Aer: `{environment.get('qiskit_aer_version')}`",
+            f"- NumPy: `{environment.get('numpy_version')}`",
+            f"- rdflib: `{environment.get('rdflib_version')}`",
+            f"- OS: `{os_payload.get('platform') or environment.get('platform')}`",
+            f"- CPU: `{cpu_payload.get('processor') or cpu_payload.get('machine')}`",
+            f"- RAM: `{format_ram(environment.get('total_ram_bytes'))}`",
+            f"- Git commit: `{environment.get('git_commit_hash')}`",
+            f"- Random seed: `{environment.get('random_seed')}`",
+            "",
+        ]
+    )
+    output_path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def plot_numeric_value(value: Any) -> float:
@@ -1386,6 +2488,50 @@ def build_argument_parser() -> argparse.ArgumentParser:
         default=True,
         help="Save CSV table outputs. Enabled by default.",
     )
+    parser.add_argument(
+        "--include-synthetic",
+        action="store_true",
+        help=(
+            "Also run Section 9.2 synthetic KG software-level observations "
+            "using the existing scalability infrastructure."
+        ),
+    )
+    parser.add_argument(
+        "--synthetic-sizes",
+        nargs="+",
+        type=int,
+        default=list(DEFAULT_SYNTHETIC_SIZES),
+        help="Synthetic triple counts for Section 9.2 observations.",
+    )
+    parser.add_argument(
+        "--synthetic-repetitions",
+        type=int,
+        default=3,
+        help="Repetitions for each synthetic size and encoding.",
+    )
+    parser.add_argument(
+        "--include-real",
+        action="store_true",
+        help=(
+            "Also run real KG software-level observations using existing real "
+            "KG examples and parsing helpers."
+        ),
+    )
+    parser.add_argument(
+        "--real-kg-files",
+        nargs="+",
+        default=None,
+        help=(
+            "Real KG files to observe. Relative names are resolved against the "
+            "repository root and data/real_kgs. Defaults to existing examples."
+        ),
+    )
+    parser.add_argument(
+        "--max-real-triples",
+        type=int,
+        default=500,
+        help="Deterministically truncate each real KG to this many triples.",
+    )
     return parser
 
 
@@ -1394,11 +2540,22 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("--shots must be at least 1.")
     if args.repetitions < 1:
         raise ValueError("--repetitions must be at least 1.")
+    if args.synthetic_repetitions < 1:
+        raise ValueError("--synthetic-repetitions must be at least 1.")
+    if any(size < 1 for size in args.synthetic_sizes):
+        raise ValueError("--synthetic-sizes values must be at least 1.")
+    if args.max_real_triples < 1:
+        raise ValueError("--max-real-triples must be at least 1.")
 
 
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     args = build_argument_parser().parse_args(argv)
     validate_args(args)
+    command_line = (
+        [sys.executable, *sys.argv]
+        if argv is None
+        else [sys.executable, str(Path(__file__).resolve()), *argv]
+    )
 
     output_dir = Path(args.output_dir)
     run_started_at = utc_timestamp()
@@ -1413,21 +2570,42 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     table3_rows = paper_encoding_table_rows(encoding_summary)
     table4_rows = paper_usage_table_rows(usage_summary)
     table6_rows = circuit_statistics_table_rows(usage_summary)
+    synthetic_payload = (
+        run_chapter9_synthetic_experiments(args, output_dir)
+        if args.include_synthetic
+        else None
+    )
+    real_payload = run_chapter9_real_kg_experiments(args) if args.include_real else None
+    table7_rows = synthetic_payload["rows"] if synthetic_payload else []
+    table7_latex_rows = synthetic_latex_table_rows(table7_rows) if table7_rows else []
+    table8_rows = real_payload["rows"] if real_payload else []
+    table8_latex_rows = real_latex_table_rows(table8_rows) if table8_rows else []
 
     output_dir.mkdir(parents=True, exist_ok=True)
     table3_path = output_dir / "table3_encoding_process.csv"
     table4_path = output_dir / "table4_usage_tasks.csv"
     table6_path = output_dir / "table6_circuit_statistics.csv"
+    table7_path = output_dir / "table7_synthetic_results.csv"
+    table8_path = output_dir / "table8_real_kg_results.csv"
     table3_tex_path = output_dir / "table3_encoding_process.tex"
     table4_tex_path = output_dir / "table4_usage_tasks.tex"
     table6_tex_path = output_dir / "table6_circuit_statistics.tex"
+    table7_tex_path = output_dir / "table7_synthetic_results.tex"
+    table8_tex_path = output_dir / "table8_real_kg_results.tex"
     raw_path = output_dir / "chapter9_raw_results.json"
+    synthetic_raw_path = output_dir / "synthetic_raw_results.json"
+    real_raw_path = output_dir / "real_kg_raw_results.json"
     env_path = output_dir / "environment.json"
+    run_summary_path = output_dir / "RUN_SUMMARY.md"
 
     if args.save_csv:
         write_csv(table3_rows, table3_path, ENCODING_TABLE_FIELDS)
         write_csv(table4_rows, table4_path, USAGE_TABLE_FIELDS)
         write_csv(table6_rows, table6_path, TABLE6_CIRCUIT_FIELDS)
+        if synthetic_payload:
+            write_csv(table7_rows, table7_path, SYNTHETIC_TABLE_FIELDS)
+        if real_payload:
+            write_csv(table8_rows, table8_path, REAL_TABLE_FIELDS)
         write_latex_table(
             table3_rows,
             table3_tex_path,
@@ -1449,6 +2627,28 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             caption="Chapter 9 circuit statistics for running-example tasks.",
             label="tab:chapter9-circuit-statistics",
         )
+        if synthetic_payload:
+            write_latex_table(
+                table7_latex_rows,
+                table7_tex_path,
+                SYNTHETIC_LATEX_FIELDS,
+                caption=(
+                    "Section 9.2 synthetic KG software-level observations; "
+                    "no quantum-advantage claim."
+                ),
+                label="tab:chapter9-synthetic-observations",
+            )
+        if real_payload:
+            write_latex_table(
+                table8_latex_rows,
+                table8_tex_path,
+                REAL_LATEX_FIELDS,
+                caption=(
+                    "Real KG software-level observations; no quantum-advantage "
+                    "claim."
+                ),
+                label="tab:chapter9-real-kg-observations",
+            )
 
     figures = maybe_write_plots(
         encoding_summary=encoding_summary,
@@ -1458,6 +2658,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         figures_dir=output_dir / "figures",
         index_mode=args.index_mode,
     )
+    if synthetic_payload:
+        figures.extend(
+            write_synthetic_observation_plots(
+                table7_rows,
+                output_dir / "figures",
+            )
+        )
 
     total_runtime = time.perf_counter() - start
     raw_payload = {
@@ -1475,22 +2682,50 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "table3_encoding_process": table3_rows,
         "table4_usage_tasks": table4_rows,
         "table6_circuit_statistics": table6_rows,
+        "synthetic_observations": synthetic_payload,
+        "table7_synthetic_results": table7_rows,
+        "real_kg_observations": real_payload,
+        "table8_real_kg_results": table8_rows,
         "output_files": {
             "table3_encoding_process": table3_path,
             "table4_usage_tasks": table4_path,
             "table6_circuit_statistics": table6_path,
+            "table7_synthetic_results": table7_path if synthetic_payload else None,
+            "table8_real_kg_results": table8_path if real_payload else None,
             "table3_encoding_process_tex": table3_tex_path,
             "table4_usage_tasks_tex": table4_tex_path,
             "table6_circuit_statistics_tex": table6_tex_path,
+            "table7_synthetic_results_tex": (
+                table7_tex_path if synthetic_payload else None
+            ),
+            "table8_real_kg_results_tex": table8_tex_path if real_payload else None,
             "raw_results": raw_path,
+            "synthetic_raw_results": synthetic_raw_path if synthetic_payload else None,
+            "real_kg_raw_results": real_raw_path if real_payload else None,
             "environment": env_path,
+            "run_summary": run_summary_path,
             "figures": figures,
         },
     }
+    environment = environment_payload(
+        args,
+        raw_payload=raw_payload,
+        run_summary_path=run_summary_path,
+        command_line=command_line,
+    )
     if args.save_json:
         write_json(raw_payload, raw_path)
-    environment = environment_payload(args)
+        if synthetic_payload:
+            write_json(synthetic_payload, synthetic_raw_path)
+        if real_payload:
+            write_json(real_payload, real_raw_path)
     write_json(environment, env_path)
+    write_run_summary(
+        output_path=run_summary_path,
+        args=args,
+        raw_payload=raw_payload,
+        environment=environment,
+    )
 
     print()
     print("Chapter 9 experiments complete")
@@ -1502,20 +2737,46 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     print(f"  Encoding process rows: {len(encoding_rows)}")
     print(f"  Usage task rows: {len(usage_rows)}")
     print(f"  Additional validation rows: {len(additional_validation_rows)}")
+    if synthetic_payload:
+        print(
+            "  Synthetic software-level observation rows: "
+            f"{len(table7_rows)}"
+        )
+    if real_payload:
+        print(f"  Real KG software-level observation rows: {len(table8_rows)}")
     print(f"  Output directory: {output_dir}")
     if args.save_csv:
         print(f"  Table 3 CSV: {table3_path}")
         print(f"  Table 4 CSV: {table4_path}")
         print(f"  Table 6 CSV: {table6_path}")
+        if synthetic_payload:
+            print(f"  Table 7 CSV: {table7_path}")
+        if real_payload:
+            print(f"  Table 8 CSV: {table8_path}")
         print(f"  Table 3 LaTeX: {table3_tex_path}")
         print(f"  Table 4 LaTeX: {table4_tex_path}")
         print(f"  Table 6 LaTeX: {table6_tex_path}")
+        if synthetic_payload:
+            print(f"  Table 7 LaTeX: {table7_tex_path}")
+        if real_payload:
+            print(f"  Table 8 LaTeX: {table8_tex_path}")
     if args.save_json:
         print(f"  Raw JSON: {raw_path}")
+        if synthetic_payload:
+            print(f"  Synthetic raw JSON: {synthetic_raw_path}")
+        if real_payload:
+            print(f"  Real KG raw JSON: {real_raw_path}")
     print(f"  Environment JSON: {env_path}")
+    print(f"  Run summary: {run_summary_path}")
     if figures:
         print(f"  Figures: {output_dir / 'figures'}")
-    print("  Note: old scalability experiments were not run.")
+    if args.include_synthetic or args.include_real:
+        print(
+            "  Note: Chapter 9 software-level observations reused existing "
+            "scalability helpers; old standalone scalability sweeps were not run."
+        )
+    else:
+        print("  Note: old scalability experiments were not run.")
 
     return raw_payload
 

@@ -29,6 +29,7 @@ synthetic KGs are used for controlled scalability experiments.
 - [Real KG Datasets](#real-kg-datasets)
 - [Running Experiments](#running-experiments)
 - [Chapter 9 Experiments](#chapter-9-experiments)
+  - [Chapter 9 Sections 9.2 and 9.3](#chapter-9-sections-92-and-93)
 - [Incremental Experiments](#incremental-experiments)
 - [Command-Line Reference](#command-line-reference)
 - [Simulator Limits And Run Statuses](#simulator-limits-and-run-statuses)
@@ -404,7 +405,7 @@ python scripts/run_all_experiments.py --synthetic-sizes 100 1000 5000 --repetiti
 The Chapter 9 experiment runner is separate from the older scalability
 experiments. It focuses only on the canonical six-triple running example used in
 the new thesis paper, and it writes paper-facing summary tables for the four
-encoding families and the four small validation tasks.
+encoding families and the five small validation tasks.
 
 This script does **not** run the old large synthetic/real scalability
 experiments. To run those, use `scripts/run_scaling_experiments.py` or
@@ -436,6 +437,46 @@ If you want the default output folder exactly, omit `--output-dir` or set it to
 `results/chapter9`. Run one index mode at a time in that folder, because each
 run rewrites the same table filenames.
 
+### Chapter 9 Sections 9.2 and 9.3
+
+The repository already contains synthetic KG generation code and existing real
+KG examples. The Chapter 9 runner reuses that infrastructure instead of creating
+a second generator or a separate real-KG parser path. By default it runs only
+the six-triple running-example validation; `--include-synthetic` adds the
+Section 9.2 synthetic KG software-level observations, and `--include-real` adds
+the Section 9.3 real KG software-level observations.
+
+These Section 9.2 and 9.3 runs are software-level observations on a simulator.
+They do not claim quantum advantage.
+
+Running-example validation only:
+
+```powershell
+python scripts/run_chapter9_experiments.py --shots 2048 --repetitions 5 --index-mode paper --output-dir results/chapter9
+```
+
+Running-example validation plus synthetic KG observations:
+
+```powershell
+python scripts/run_chapter9_experiments.py --shots 2048 --repetitions 5 --index-mode paper --include-synthetic --synthetic-sizes 6 10 25 50 100 250 500 --synthetic-repetitions 3 --output-dir results/chapter9
+```
+
+Running-example validation plus real KG observations using repository defaults:
+
+```powershell
+python scripts/run_chapter9_experiments.py --shots 2048 --repetitions 5 --index-mode paper --include-real --max-real-triples 500 --output-dir results/chapter9
+```
+
+Running-example validation plus specific real KG files:
+
+```powershell
+python scripts/run_chapter9_experiments.py --shots 2048 --repetitions 5 --index-mode paper --include-real --real-kg-files data/real/example1.ttl data/real/example2.ttl --max-real-triples 500 --output-dir results/chapter9
+```
+
+If `--include-real` is used without `--real-kg-files`, the runner uses the
+repository defaults from `data/real_kgs`. If explicit paths are supplied, replace
+the example paths above with the real files you want to observe.
+
 ### Chapter 9 Outputs
 
 For an output directory such as `results/chapter9`, the script writes:
@@ -448,13 +489,23 @@ For an output directory such as `results/chapter9`, the script writes:
 | `results/chapter9/table4_usage_tasks.tex` | Compact LaTeX version of Table 4. |
 | `results/chapter9/table6_circuit_statistics.csv` | Circuit statistics for the five Chapter 9 running-example task validations: qubits, depth, gate counts, transpiled metrics, shots, and repetitions. |
 | `results/chapter9/table6_circuit_statistics.tex` | Compact LaTeX version of Table 6. |
+| `results/chapter9/table7_synthetic_results.csv` | Optional Section 9.2 synthetic KG software-level observations when `--include-synthetic` is passed. |
+| `results/chapter9/table7_synthetic_results.tex` | Compact LaTeX version of Table 7 with triples, encoding, qubits, encoding time, depth, simulation time, and status. |
+| `results/chapter9/synthetic_raw_results.json` | Optional raw synthetic observation payload with detailed rows and reused scalability-runner rows. |
+| `results/chapter9/table8_real_kg_results.csv` | Optional real KG software-level observations when `--include-real` is passed. |
+| `results/chapter9/table8_real_kg_results.tex` | Compact LaTeX version of Table 8 with dataset, triples, entities, predicates, encoding, qubits, encoding time, and status. |
+| `results/chapter9/real_kg_raw_results.json` | Optional raw real KG observation payload with detailed rows and reused parser/encoding helper rows. |
 | `results/chapter9/chapter9_raw_results.json` | Full raw run metadata, detailed rows, task payloads, and the additional combined amplitude-phase validation kept separate from Table 4. Use this as the audit trail, not as a table pasted into the paper. |
 | `results/chapter9/environment.json` | Reproducibility metadata: Python, OS, CPU/RAM when available, package versions, command-line arguments, timestamp, seed, hostname, and git commit hash when available. |
+| `results/chapter9/RUN_SUMMARY.md` | Human-readable reproducibility summary with the exact command, generated tables and plots, optional synthetic sizes, optional real KG files, skipped/failed rows and reasons, environment metadata, and the simulator/no-quantum-advantage note. |
 | `results/chapter9/figures/` | Optional runtime and paper-facing plots, including Table 3 time/qubits, Table 4 task time, amplitude probabilities, and combined magnitude/phase. |
+| `results/chapter9/figures/synthetic_*.png` | Optional Section 9.2 line plots for synthetic encoding time, qubits, circuit depth, and total time when `--include-synthetic` is passed. |
 
 At the end of a run, the script prints a short summary including the machine
-specification line, table paths, environment path, and a note that old
-scalability experiments were not run.
+specification line, table paths, environment path, and run summary path. The
+default run does not execute the old scalability experiments; the optional
+synthetic and real KG flags add Chapter 9 software-level observations using the
+existing helpers.
 
 ## Incremental Experiments
 
