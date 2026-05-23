@@ -49,8 +49,10 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertIn("old scalability experiments were not run", completed.stdout)
             self.assertTrue((output_dir / "table3_encoding_process.csv").exists())
             self.assertTrue((output_dir / "table4_usage_tasks.csv").exists())
+            self.assertTrue((output_dir / "table6_circuit_statistics.csv").exists())
             self.assertTrue((output_dir / "table3_encoding_process.tex").exists())
             self.assertTrue((output_dir / "table4_usage_tasks.tex").exists())
+            self.assertTrue((output_dir / "table6_circuit_statistics.tex").exists())
             self.assertTrue((output_dir / "chapter9_raw_results.json").exists())
             self.assertTrue((output_dir / "environment.json").exists())
             if importlib.util.find_spec("matplotlib") is not None:
@@ -73,6 +75,10 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 .read_text(encoding="utf-8")
                 .splitlines()[0]
             )
+            table6_text = (output_dir / "table6_circuit_statistics.csv").read_text(
+                encoding="utf-8"
+            )
+            table6_lines = table6_text.splitlines()
             table4_csv = (output_dir / "table4_usage_tasks.csv").read_text(
                 encoding="utf-8"
             )
@@ -88,10 +94,30 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 table4_header,
                 "KG Task,Encoding,Quantum Method,Main Result,Time",
             )
+            self.assertEqual(
+                table6_lines[0],
+                (
+                    "Task,Encoding,Method,Qubits,Circuit Depth,Gate Count,"
+                    "Transpiled Depth,Transpiled Gate Count,Shots,Repetitions"
+                ),
+            )
+            for expected_row in (
+                "Search,Basis,Grover",
+                "Entity Matching,Amplitude,Swap Test",
+                "Link Prediction,Amplitude,Distance Estimation",
+                "Multi-hop Reasoning,Phase,Phase Kickback",
+                "Schema Matching,Phase,QFT",
+            ):
+                self.assertIn(expected_row, table6_text)
+            self.assertIn(",0,1", table6_text)
+            self.assertIn("--", table6_text)
             table3_tex = (output_dir / "table3_encoding_process.tex").read_text(
                 encoding="utf-8"
             )
             table4_tex = (output_dir / "table4_usage_tasks.tex").read_text(
+                encoding="utf-8"
+            )
+            table6_tex = (output_dir / "table6_circuit_statistics.tex").read_text(
                 encoding="utf-8"
             )
             self.assertIn(
@@ -126,6 +152,13 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 "chapter9_raw_results",
                 table4_tex,
             )
+            self.assertIn(
+                (
+                    "Task & Encoding & Method & Qubits & Circuit Depth & Gate Count "
+                    "& Transpiled Depth & Transpiled Gate Count & Shots & Repetitions"
+                ),
+                table6_tex,
+            )
 
             payload = json.loads(
                 (output_dir / "chapter9_raw_results.json").read_text(encoding="utf-8")
@@ -134,6 +167,7 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertEqual(len(payload["encoding_process_rows"]), 6)
             self.assertEqual(len(payload["usage_task_rows"]), 5)
             self.assertEqual(len(payload["additional_validation_rows"]), 1)
+            self.assertEqual(len(payload["table6_circuit_statistics"]), 5)
             self.assertNotIn(
                 "combined_amplitude_phase_demo",
                 [row["task"] for row in payload["usage_task_rows"]],

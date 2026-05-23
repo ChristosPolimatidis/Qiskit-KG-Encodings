@@ -90,6 +90,19 @@ USAGE_TABLE_FIELDS = [
 
 USAGE_LATEX_FIELDS = USAGE_TABLE_FIELDS
 
+TABLE6_CIRCUIT_FIELDS = [
+    "Task",
+    "Encoding",
+    "Method",
+    "Qubits",
+    "Circuit Depth",
+    "Gate Count",
+    "Transpiled Depth",
+    "Transpiled Gate Count",
+    "Shots",
+    "Repetitions",
+]
+
 TABLE1_TASK_ORDER = [
     "search_grover_lookup",
     "entity_matching_swap_test",
@@ -853,6 +866,20 @@ def seconds_to_ms_label(value: Any) -> str:
     return f"{milliseconds} ms" if milliseconds else ""
 
 
+def number_or_dash(value: Any, digits: int = 3) -> str:
+    if value in (None, ""):
+        return "--"
+    formatted = number_or_blank(value, digits=digits)
+    return formatted if formatted else "--"
+
+
+def shots_or_zero(value: Any) -> str:
+    if value in (None, ""):
+        return "0"
+    formatted = number_or_blank(value)
+    return formatted if formatted else "0"
+
+
 def compact_note(note: Any, max_length: int = 72) -> str:
     text = str(note or "")
     if len(text) <= max_length:
@@ -923,6 +950,40 @@ def paper_usage_table_rows(summary_rows: list[dict[str, Any]]) -> list[dict[str,
                 "Quantum Method": quantum_method,
                 "Main Result": main_result,
                 "Time": seconds_to_ms_label(row.get("mean_task_time_seconds")),
+            }
+        )
+    return rows
+
+
+def circuit_statistics_table_rows(
+    summary_rows: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    """Build Table 6 from task statistics already returned by the task modules."""
+
+    summary_by_task = {
+        str(row.get("task")): row
+        for row in summary_rows
+    }
+    rows: list[dict[str, str]] = []
+    for task_id in TABLE1_TASK_ORDER:
+        if task_id not in summary_by_task:
+            continue
+        row = summary_by_task[task_id]
+        task, encoding, method = TABLE1_TASK_LABELS[task_id]
+        rows.append(
+            {
+                "Task": task,
+                "Encoding": encoding,
+                "Method": method.replace(" lookup", ""),
+                "Qubits": number_or_dash(row.get("mean_num_qubits")),
+                "Circuit Depth": number_or_dash(row.get("mean_circuit_depth")),
+                "Gate Count": number_or_dash(row.get("mean_gate_count")),
+                "Transpiled Depth": number_or_dash(row.get("mean_transpiled_depth")),
+                "Transpiled Gate Count": number_or_dash(
+                    row.get("mean_transpiled_gate_count")
+                ),
+                "Shots": shots_or_zero(row.get("shots")),
+                "Repetitions": number_or_dash(row.get("run_count")),
             }
         )
     return rows
@@ -1351,18 +1412,22 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     additional_validation_summary = summarize_usage_rows(additional_validation_rows)
     table3_rows = paper_encoding_table_rows(encoding_summary)
     table4_rows = paper_usage_table_rows(usage_summary)
+    table6_rows = circuit_statistics_table_rows(usage_summary)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     table3_path = output_dir / "table3_encoding_process.csv"
     table4_path = output_dir / "table4_usage_tasks.csv"
+    table6_path = output_dir / "table6_circuit_statistics.csv"
     table3_tex_path = output_dir / "table3_encoding_process.tex"
     table4_tex_path = output_dir / "table4_usage_tasks.tex"
+    table6_tex_path = output_dir / "table6_circuit_statistics.tex"
     raw_path = output_dir / "chapter9_raw_results.json"
     env_path = output_dir / "environment.json"
 
     if args.save_csv:
         write_csv(table3_rows, table3_path, ENCODING_TABLE_FIELDS)
         write_csv(table4_rows, table4_path, USAGE_TABLE_FIELDS)
+        write_csv(table6_rows, table6_path, TABLE6_CIRCUIT_FIELDS)
         write_latex_table(
             table3_rows,
             table3_tex_path,
@@ -1376,6 +1441,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             USAGE_LATEX_FIELDS,
             caption="Chapter 9 usage task benchmark on the six-triple running example.",
             label="tab:chapter9-usage-tasks",
+        )
+        write_latex_table(
+            table6_rows,
+            table6_tex_path,
+            TABLE6_CIRCUIT_FIELDS,
+            caption="Chapter 9 circuit statistics for running-example tasks.",
+            label="tab:chapter9-circuit-statistics",
         )
 
     figures = maybe_write_plots(
@@ -1402,11 +1474,14 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "additional_validation_internal": additional_validation_summary,
         "table3_encoding_process": table3_rows,
         "table4_usage_tasks": table4_rows,
+        "table6_circuit_statistics": table6_rows,
         "output_files": {
             "table3_encoding_process": table3_path,
             "table4_usage_tasks": table4_path,
+            "table6_circuit_statistics": table6_path,
             "table3_encoding_process_tex": table3_tex_path,
             "table4_usage_tasks_tex": table4_tex_path,
+            "table6_circuit_statistics_tex": table6_tex_path,
             "raw_results": raw_path,
             "environment": env_path,
             "figures": figures,
@@ -1431,8 +1506,10 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     if args.save_csv:
         print(f"  Table 3 CSV: {table3_path}")
         print(f"  Table 4 CSV: {table4_path}")
+        print(f"  Table 6 CSV: {table6_path}")
         print(f"  Table 3 LaTeX: {table3_tex_path}")
         print(f"  Table 4 LaTeX: {table4_tex_path}")
+        print(f"  Table 6 LaTeX: {table6_tex_path}")
     if args.save_json:
         print(f"  Raw JSON: {raw_path}")
     print(f"  Environment JSON: {env_path}")

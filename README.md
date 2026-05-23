@@ -446,6 +446,8 @@ For an output directory such as `results/chapter9`, the script writes:
 | `results/chapter9/table3_encoding_process.tex` | Compact LaTeX version of Table 3. |
 | `results/chapter9/table4_usage_tasks.csv` | Paper-facing Table 4 data for the Table 1 task-to-encoding mapping: Search/Grover lookup, Entity Matching/Swap Test, Link Prediction/Distance Estimation, Multi-hop Reasoning/Phase Kickback, and Schema Matching/QFT. |
 | `results/chapter9/table4_usage_tasks.tex` | Compact LaTeX version of Table 4. |
+| `results/chapter9/table6_circuit_statistics.csv` | Circuit statistics for the five Chapter 9 running-example task validations: qubits, depth, gate counts, transpiled metrics, shots, and repetitions. |
+| `results/chapter9/table6_circuit_statistics.tex` | Compact LaTeX version of Table 6. |
 | `results/chapter9/chapter9_raw_results.json` | Full raw run metadata, detailed rows, task payloads, and the additional combined amplitude-phase validation kept separate from Table 4. Use this as the audit trail, not as a table pasted into the paper. |
 | `results/chapter9/environment.json` | Reproducibility metadata: Python, OS, CPU/RAM when available, package versions, command-line arguments, timestamp, seed, hostname, and git commit hash when available. |
 | `results/chapter9/figures/` | Optional runtime and paper-facing plots, including Table 3 time/qubits, Table 4 task time, amplitude probabilities, and combined magnitude/phase. |

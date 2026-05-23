@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\caption{Chapter 9 circuit statistics for running-example tasks.}
+\label{tab:chapter9-circuit-statistics}
+\begin{tabular}{@{}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}@{}}
+\hline
+Task & Encoding & Method & Qubits & Circuit Depth & Gate Count & Transpiled Depth & Transpiled Gate Count & Shots & Repetitions \\
+\hline
+Search & Basis & Grover & 3 & 21 & 43 & 22 & 47 & 2048 & 1 \\
+Entity Matching & Amplitude & Swap Test & 5 & 5 & 7 & 5 & 7 & 2048 & 1 \\
+Link Prediction & Amplitude & Distance Estimation & 3 & 4 & 6 & 4 & 6 & 2048 & 1 \\
+Multi-hop Reasoning & Phase & Phase Kickback & 2 & 3 & 4 & -- & -- & 0 & 1 \\
+Schema Matching & Phase & QFT & 4 & 2 & 4 & -- & -- & 0 & 1 \\
+\hline
+\end{tabular}
+\end{table}
