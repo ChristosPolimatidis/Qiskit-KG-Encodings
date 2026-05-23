@@ -1,11 +1,37 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import math
+import time
 
 import numpy as np
 from qiskit import QuantumCircuit
 
 from src.models import TripleRecord
+from src.running_example import (
+    PAPER_INDEX_DIMENSION,
+    SEQUENTIAL_INDEX_DIMENSION,
+    get_running_example_indices,
+    get_running_example_triples,
+)
+
+
+INDEX_MODES = ("sequential", "paper")
+
+
+@dataclass(frozen=True, slots=True)
+class SparseIndexAmplitudeEncodingResult:
+    """Result bundle for sparse index-aligned amplitude encoding."""
+
+    statevector: np.ndarray
+    num_qubits: int
+    dimension: int
+    nonzero_indices: list[int]
+    normalized_amplitudes: list[float]
+    measurement_probabilities: dict[str, float]
+    preparation_time_seconds: float
+    index_mode: str
+    index_map: dict[TripleRecord, int]
 
 
 def next_power_of_two_length(length: int) -> int:
@@ -16,6 +42,65 @@ def next_power_of_two_length(length: int) -> int:
     if length == 1:
         return 2
     return 1 << math.ceil(math.log2(length))
+
+
+def _is_running_example(triples: list[TripleRecord]) -> bool:
+    return triples == get_running_example_triples()
+
+
+def _sequential_index_map(triples: list[TripleRecord]) -> dict[TripleRecord, int]:
+    return {
+        triple: index
+        for index, triple in enumerate(triples)
+    }
+
+
+def _resolve_sparse_index_map(
+    triples: list[TripleRecord],
+    index_mode: str,
+    index_map: dict[TripleRecord, int] | None,
+) -> tuple[dict[TripleRecord, int], int]:
+    if index_mode not in INDEX_MODES:
+        raise ValueError("Unsupported index mode. Use 'sequential' or 'paper'.")
+
+    if index_map is not None:
+        selected_index_map = dict(index_map)
+        missing_triples = [
+            triple for triple in triples if triple not in selected_index_map
+        ]
+        if missing_triples:
+            raise ValueError("The custom index map must include every triple.")
+        dimension = next_power_of_two_length(max(selected_index_map.values()) + 1)
+        return selected_index_map, dimension
+
+    if index_mode == "sequential":
+        selected_index_map = (
+            get_running_example_indices(mode="sequential")
+            if _is_running_example(triples)
+            else _sequential_index_map(triples)
+        )
+        dimension = (
+            SEQUENTIAL_INDEX_DIMENSION
+            if _is_running_example(triples)
+            else next_power_of_two_length(len(triples))
+        )
+        return selected_index_map, dimension
+
+    if not _is_running_example(triples):
+        raise ValueError(
+            "Paper index mode without a custom index map is defined for the "
+            "canonical six-triple running example."
+        )
+    return get_running_example_indices(mode="paper"), PAPER_INDEX_DIMENSION
+
+
+def _probabilities_dict(statevector: np.ndarray, num_qubits: int) -> dict[str, float]:
+    probabilities = np.abs(statevector) ** 2
+    return {
+        format(index, f"0{num_qubits}b"): float(probability)
+        for index, probability in enumerate(probabilities)
+        if probability > 1e-15
+    }
 
 
 def build_amplitude_vector(
@@ -132,3 +217,85 @@ def build_amplitude_encoding_artifacts(
             for index in range(len(triples), len(padded_vector))
         ],
     }
+
+
+def build_sparse_index_amplitude_encoding(
+    triples: list[TripleRecord],
+    index_mode: str = "sequential",
+    weights: list[float] | np.ndarray | None = None,
+    index_map: dict[TripleRecord, int] | None = None,
+) -> SparseIndexAmplitudeEncodingResult:
+    """Build an amplitude state over a sparse index space.
+
+    Non-existing indices receive amplitude zero. Sequential mode maps triples to
+    contiguous indices unless the canonical running example mapping is used.
+    Paper mode uses the running-example paper indices unless a custom index map
+    is supplied.
+    """
+
+    start_time = time.perf_counter()
+    selected_triples = list(triples)
+    if not selected_triples:
+        raise ValueError("Sparse index amplitude encoding requires at least one triple.")
+
+    selected_index_map, dimension = _resolve_sparse_index_map(
+        triples=selected_triples,
+        index_mode=index_mode,
+        index_map=index_map,
+    )
+    raw_amplitudes = build_amplitude_vector(
+        triples=selected_triples,
+        weights=weights,
+        strategy="uniform",
+    )
+    normalized_amplitudes = normalize_vector(raw_amplitudes).astype(complex)
+    statevector = np.zeros(dimension, dtype=complex)
+
+    for triple, amplitude in zip(selected_triples, normalized_amplitudes):
+        index = selected_index_map[triple]
+        if index < 0 or index >= dimension:
+            raise ValueError(
+                f"Triple index {index} is outside dimension {dimension}."
+            )
+        statevector[index] = amplitude
+
+    num_qubits = int(math.log2(dimension))
+    nonzero_indices = sorted(
+        index for index, value in enumerate(statevector) if abs(value) > 1e-15
+    )
+    return SparseIndexAmplitudeEncodingResult(
+        statevector=statevector,
+        num_qubits=num_qubits,
+        dimension=dimension,
+        nonzero_indices=nonzero_indices,
+        normalized_amplitudes=[
+            float(value.real)
+            for value in normalized_amplitudes
+        ],
+        measurement_probabilities=_probabilities_dict(
+            statevector=statevector,
+            num_qubits=num_qubits,
+        ),
+        preparation_time_seconds=time.perf_counter() - start_time,
+        index_mode=index_mode,
+        index_map={
+            triple: selected_index_map[triple]
+            for triple in selected_triples
+        },
+    )
+
+
+def build_paper_amplitude_encoding(
+    triples: list[TripleRecord],
+    index_mode: str = "paper",
+    weights: list[float] | np.ndarray | None = None,
+    index_map: dict[TripleRecord, int] | None = None,
+) -> SparseIndexAmplitudeEncodingResult:
+    """Alias for sparse index-aligned paper amplitude encoding."""
+
+    return build_sparse_index_amplitude_encoding(
+        triples=triples,
+        index_mode=index_mode,
+        weights=weights,
+        index_map=index_map,
+    )

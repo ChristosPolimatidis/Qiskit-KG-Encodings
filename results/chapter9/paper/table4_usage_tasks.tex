@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\caption{Chapter 9 usage task benchmark on the six-triple running example.}
+\label{tab:chapter9-usage-tasks}
+\begin{tabular}{@{}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}@{}}
+\hline
+KG Task & Encoding & Quantum Method & Main Result & Time \\
+\hline
+Search & Basis & Grover lookup & success: 0.945; sequential-only validation task & 89.57 ms \\
+Entity Matching & Amplitude & Swap Test & similarity: 0.652 & 94.8 ms \\
+Link Prediction & Amplitude & Distance Estimation & distance: 0.028 & 94.64 ms \\
+Multi-hop Reasoning & Phase & Phase Kickback & phase error: 0 & 0.47 ms \\
+Schema Matching & Phase & QFT & Fourier similarity: 0.991 & 1.55 ms \\
+\hline
+\end{tabular}
+\end{table}

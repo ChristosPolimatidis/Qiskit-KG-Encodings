@@ -28,6 +28,7 @@ synthetic KGs are used for controlled scalability experiments.
 - [Synthetic KG Datasets](#synthetic-kg-datasets)
 - [Real KG Datasets](#real-kg-datasets)
 - [Running Experiments](#running-experiments)
+- [Chapter 9 Experiments](#chapter-9-experiments)
 - [Incremental Experiments](#incremental-experiments)
 - [Command-Line Reference](#command-line-reference)
 - [Simulator Limits And Run Statuses](#simulator-limits-and-run-statuses)
@@ -397,6 +398,61 @@ results/scaling/combined/
 ```powershell
 python scripts/run_all_experiments.py --synthetic-sizes 100 1000 5000 --repetitions 5 --shots 1024 --timeout-seconds 600
 ```
+
+## Chapter 9 Experiments
+
+The Chapter 9 experiment runner is separate from the older scalability
+experiments. It focuses only on the canonical six-triple running example used in
+the new thesis paper, and it writes paper-facing summary tables for the four
+encoding families and the four small validation tasks.
+
+This script does **not** run the old large synthetic/real scalability
+experiments. To run those, use `scripts/run_scaling_experiments.py` or
+`scripts/run_all_experiments.py` explicitly.
+
+These Chapter 9 runs are simulator-based validation experiments using Qiskit and
+Aer Simulator. They are useful for checking encoding behavior, table values, and
+small task demonstrations. They are **not** quantum-advantage results.
+
+### Sequential Index Mode
+
+Sequential mode maps the six running-example triples to indices `0..5` and pads
+index-based states to dimension `8`.
+
+```powershell
+python scripts/run_chapter9_experiments.py --index-mode sequential --shots 2048 --repetitions 5 --output-dir results/chapter9/sequential
+```
+
+### Paper Index Mode
+
+Paper mode uses the sparse paper indices `T = {1, 17, 27, 37, 88, 124}`, so
+index-based states use 8 qubits and dimension `256`.
+
+```powershell
+python scripts/run_chapter9_experiments.py --index-mode paper --shots 2048 --repetitions 5 --output-dir results/chapter9/paper
+```
+
+If you want the default output folder exactly, omit `--output-dir` or set it to
+`results/chapter9`. Run one index mode at a time in that folder, because each
+run rewrites the same table filenames.
+
+### Chapter 9 Outputs
+
+For an output directory such as `results/chapter9`, the script writes:
+
+| Output | Purpose |
+| --- | --- |
+| `results/chapter9/table3_encoding_process.csv` | Paper-facing Table 3 data for encoding creation: encoding, variant, index mode, qubits, dimension, creation time, circuit metrics, and notes. |
+| `results/chapter9/table3_encoding_process.tex` | Compact LaTeX version of Table 3. |
+| `results/chapter9/table4_usage_tasks.csv` | Paper-facing Table 4 data for the Table 1 task-to-encoding mapping: Search/Grover lookup, Entity Matching/Swap Test, Link Prediction/Distance Estimation, Multi-hop Reasoning/Phase Kickback, and Schema Matching/QFT. |
+| `results/chapter9/table4_usage_tasks.tex` | Compact LaTeX version of Table 4. |
+| `results/chapter9/chapter9_raw_results.json` | Full raw run metadata, detailed rows, task payloads, and the additional combined amplitude-phase validation kept separate from Table 4. Use this as the audit trail, not as a table pasted into the paper. |
+| `results/chapter9/environment.json` | Reproducibility metadata: Python, OS, CPU/RAM when available, package versions, command-line arguments, timestamp, seed, hostname, and git commit hash when available. |
+| `results/chapter9/figures/` | Optional runtime and paper-facing plots, including Table 3 time/qubits, Table 4 task time, amplitude probabilities, and combined magnitude/phase. |
+
+At the end of a run, the script prints a short summary including the machine
+specification line, table paths, environment path, and a note that old
+scalability experiments were not run.
 
 ## Incremental Experiments
 

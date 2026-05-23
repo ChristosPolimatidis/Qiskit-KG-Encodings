@@ -1,0 +1,7 @@
+Encoding,Variant,Index Mode,Qubits,Dimension,Time to Create (ms),Circuit Depth,Gate Count,Transpiled Depth,Transpiled Gate Count,Notes
+Amplitude,Compact baseline,compact,3,8,0.29,1,1,1,1,Compact amplitude baseline over contiguous triple positions 0..5.
+Amplitude,Paper-aligned index,paper,8,256,0.18,1,1,1,1,Amplitude support state using the selected Chapter 9 index mapping.
+Basis,Index support,paper,8,256,0.49,1,1,1,1,Basis/index support state over the six running-example triples.
+Combined,Amplitude + phase,paper,8,256,0.15,,,,,Combined alpha_k exp(i theta_k) state over existing triple indices.
+Phase,Predicate phase,paper,8,256,32.81,2,2,2,2,Predicate phase over full support.
+Phase,Presence phase,paper,8,256,33.21,2,2,2,2,Presence phase assigns pi to existing triple indices and 0 elsewhere.

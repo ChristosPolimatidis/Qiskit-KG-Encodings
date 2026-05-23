@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\caption{Chapter 9 usage task benchmark on the six-triple running example.}
+\label{tab:chapter9-usage-tasks}
+\begin{tabular}{@{}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}@{}}
+\hline
+Encoding & Task & Qubits & Task Time (ms) & Success / Main Metric & Notes \\
+\hline
+Amplitude & Swap-test similarity & 5 & 105.81 & absolute error: 0.014 & Index-mode independent feature-vector task; swap-test estimate compar... \\
+Basis & Exact triple lookup & 3 & 99.5 & success probability: 0.947 & sequential-only validation task: compact 3-qubit/8-state Grover-style... \\
+Combined & Amplitude-phase demo & 8 & 0.27 & state norm: 1 & Uses paper index mode; combined alpha\_k exp(i theta\_k) demonstration... \\
+Phase & Predicate filtering & 8 & 106.97 & marked probability after: 0.03 & Uses paper index mode; predicate sign-flip followed by diffuser-style... \\
+\hline
+\end{tabular}
+\end{table}

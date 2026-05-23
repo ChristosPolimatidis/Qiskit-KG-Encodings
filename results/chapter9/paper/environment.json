@@ -1,0 +1,60 @@
+{
+  "timestamp_utc": "2026-05-23T18:47:48+00:00",
+  "created_at_utc": "2026-05-23T18:47:48+00:00",
+  "python_version": "3.13.5",
+  "python": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "operating_system": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "hostname": "DESKTOP-8ICK71U",
+  "cpu": {
+    "processor": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "machine": "AMD64",
+    "architecture": "64bit",
+    "logical_cpus": 12
+  },
+  "total_ram_bytes": 42678145024,
+  "total_ram_gib": 39.75,
+  "qiskit_version": "2.4.1",
+  "qiskit_aer_version": "0.17.2",
+  "numpy_version": "1.26.4",
+  "rdflib_version": "7.6.0",
+  "packages": {
+    "qiskit": "2.4.1",
+    "qiskit-aer": "0.17.2",
+    "numpy": "1.26.4",
+    "rdflib": "7.6.0",
+    "matplotlib": "3.10.3"
+  },
+  "script": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\scripts\\run_chapter9_experiments.py",
+  "repository_root": "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings",
+  "command_line_arguments": {
+    "shots": 2048,
+    "repetitions": 5,
+    "index_mode": "paper",
+    "output_dir": "results/chapter9/paper",
+    "backend": "aer_simulator",
+    "seed": 12345,
+    "include_combined": true,
+    "save_json": true,
+    "save_csv": true
+  },
+  "arguments": {
+    "shots": 2048,
+    "repetitions": 5,
+    "index_mode": "paper",
+    "output_dir": "results/chapter9/paper",
+    "backend": "aer_simulator",
+    "seed": 12345,
+    "include_combined": true,
+    "save_json": true,
+    "save_csv": true
+  },
+  "random_seed": 12345,
+  "git_commit_hash": "261450b324b1482fbbc6592c041d1ad67d41d68c",
+  "note": "This runner only executes Chapter 9 six-triple running-example experiments. It does not call the old scalability runners."
+}
