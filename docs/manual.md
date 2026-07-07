@@ -1,181 +1,242 @@
-# Qiskit KG Encodings
+# Qiskit KG Encodings Manual
 
-## Small User Manual
+This is a compact guide to the code layout and normal experiment workflow.
 
-This repository implements a reusable Python pipeline for encoding RDF Knowledge Graphs into quantum states with Qiskit.
+For the shortest path, run:
 
-It supports three encoding families:
+```powershell
+.\scripts\run_experiments_windows.ps1 -Profile light -ResultsRoot results\runs
+```
 
-- basis encoding
-- amplitude encoding
-- phase encoding
+That command creates one timestamped result folder and a zip archive.
 
-The default dataset is included in `data/running_example.ttl`, but the code is designed so you can later replace that file with another Turtle graph and run the same pipeline again.
+## Code Layout
 
-## What The Project Does
+Core modules live under `src/`.
 
-The workflow is:
+| Module | Purpose |
+| --- | --- |
+| `kg_parser.py` | Load RDF files and extract triples. |
+| `models.py` | Shared data structures. |
+| `id_mapper.py` | Build deterministic entity and predicate mappings. |
+| `basis_encoding.py` | Encode triples as computational basis states. |
+| `amplitude_encoding.py` | Build amplitude vectors over triple indices. |
+| `phase_encoding.py` | Build phase-marking circuits and phase helpers. |
+| `combined_encoding.py` | Combine amplitude magnitudes with predicate phases. |
+| `visualization.py` | Save JSON logs and plots for lower-level CLI runs. |
+| `main.py` | Reusable single-encoding command-line entry point. |
+| `tasks/` | Named task experiments used by the suite runner. |
 
-1. load an RDF graph from a file
-2. parse the triples
-3. build deterministic ID mappings
-4. create an encoding-specific representation
-5. build a Qiskit circuit
-6. simulate locally with Aer
-7. save logs and figures
+Automation lives under `scripts/`.
 
-The code is split into reusable modules under `src/`:
+| Script | Purpose |
+| --- | --- |
+| `run_experiments_windows.ps1` | Main Windows profile runner. |
+| `run_experiment_suite.py` | Core task-level suite. |
+| `collect_run_outputs.py` | Collect artifacts and build normalized summary CSV. |
+| `write_environment_info.py` | Save Python/package/OS/git metadata. |
+| `run_all_experiments.py` | Synthetic plus real scaling runner. |
+| `run_scaling_experiments.py` | Synthetic-only scaling runner. |
+| `generate_scaling_datasets.py` | Generate deterministic synthetic datasets. |
+| `run_classical_baselines.py` | Run classical sanity baselines. |
 
-- `kg_parser.py`: RDF loading and triple extraction
-- `id_mapper.py`: entity/object and predicate indexing
-- `basis_encoding.py`: basis-state encoding of triples
-- `amplitude_encoding.py`: amplitude vectors over triple indices
-- `phase_encoding.py`: phase-marking rules over triple indices
-- `visualization.py`: JSON logs and bar-chart figures
-- `main.py`: command-line entry point
+## Main Runner
 
-## Default Dataset
+From the repository root:
 
-The included example graph contains six triples:
+```powershell
+.\scripts\run_experiments_windows.ps1 -Profile light
+.\scripts\run_experiments_windows.ps1 -Profile medium
+.\scripts\run_experiments_windows.ps1 -Profile hard
+```
 
-- Aristotle is typed as Person
-- Person is a subclass of Mortal
-- Aristotle lives at Athens
-- Athens is typed as City
-- City is a subclass of Place
-- Aristotle teaches Philosophy
+With an explicit results root:
+
+```powershell
+.\scripts\run_experiments_windows.ps1 -Profile medium -ResultsRoot results\runs
+```
+
+Use `-InstallDeps` only when dependencies need to be installed:
 
-This dataset is only a demo target for the thesis repository. The implementation itself is not hardcoded only for these six triples.
+```powershell
+.\scripts\run_experiments_windows.ps1 -Profile light -InstallDeps
+```
 
-## Basis Encoding
+## Profiles
 
-For basis encoding, each triple `(s, p, o)` is converted into a computational basis state:
+| Profile | Use | Shots | Repetitions |
+| --- | --- | ---: | ---: |
+| `light` | Quick smoke test. | 1,000 | 1 |
+| `medium` | Main desktop-sized run. | 10,000 | 3 |
+| `hard` | Longer scaling run. | 10,000 | 5 |
 
-`subject_bits || predicate_bits || object_bits`
+The profiles differ by shots, repetitions, synthetic sizes, real dataset use,
+and timeout behavior.
 
-Important details:
+## Result Folder
 
-- subject and object share the same ID space
-- predicates use a separate ID space
-- bit widths are computed dynamically from the loaded graph
-- the displayed bitstring is kept explicit so the Qiskit endianness is easier to interpret
+Each run creates:
 
-The framework can also build a small uniform superposition over the encoded triple states for demonstration purposes.
+```text
+results/runs/<timestamp>_<profile>/
+```
 
-## Amplitude Encoding
+The folder contains:
 
-Amplitude encoding is defined over triple indices:
+```text
+logs/
+tables/
+plots/
+json/
+raw/
+summary/
+circuits/
+histograms/
+run_config.json
+run_manifest.json
+command_log.jsonl
+```
 
-- `|i>` corresponds to the `i`-th triple in the current graph context
-- the vector is padded automatically to the next power of two
-- the state is normalized automatically
+The runner also creates:
 
-If no custom weights are provided, the project uses a default strategy such as uniform weights.
+```text
+results/runs/<timestamp>_<profile>.zip
+```
 
-For the running example, the experiment script uses the thesis demo vector:
+Start with:
 
-`[2, 1, 3, 1, 1, 2]`
+- `run_config.json`
+- `run_manifest.json`
+- `summary/results_summary.csv`
+- `summary/artifact_index.csv`
+- `logs/`
 
-which is padded automatically to length 8 before state preparation.
+## Core Task Experiments
 
-## Phase Encoding
+The core suite runs:
 
-Phase encoding is also defined over triple indices.
+- basis lookup
+- amplitude similarity
+- phase filtering
+- entity matching style distance/similarity check
+- keyword search
+- schema matching
+- multi-hop phase accumulation
+- combined amplitude + phase encoding
 
-The pipeline:
+Each task writes structured outputs under the run folder. The collector merges
+numeric rows into:
 
-1. creates a uniform superposition over the valid triple indices
-2. applies a phase shift to marked states
-3. applies a Hadamard mixing step to create interference
+```text
+summary/results_summary.csv
+```
 
-The marking rule is reusable. It is not hardcoded only for Aristotle.
+## Basic Encoding CLI
 
-Examples:
+You can run one encoding directly:
 
-- mark triples by predicate URI
-- mark triples by subject URI
-- mark triples with a custom condition function
+```powershell
+python -m src.main --encoding basis --input data/running_example.ttl
+python -m src.main --encoding amplitude --input data/running_example.ttl
+python -m src.main --encoding phase --input data/running_example.ttl
+```
 
-For the included running example, the default demo rule marks triples with predicate `http://example.org/teaches`.
+Useful options:
 
-## Command-Line Usage
+```powershell
+--shots 1000
+--results-dir results\scratch_single
+--output-prefix my_run
+--skip-plots
+--weights 2,1,3,1,1,2
+--mark-predicate http://example.org/teaches
+--mark-subject http://example.org/Aristotle
+```
 
-Run the project with:
+Use the profile runner for complete experiment runs. Use `src.main` for focused
+debugging of one encoding.
 
-`python -m src.main --encoding basis --input data/running_example.ttl`
+## Data
 
-`python -m src.main --encoding amplitude --input data/running_example.ttl`
+Default small RDF input:
 
-`python -m src.main --encoding phase --input data/running_example.ttl`
+```text
+data/running_example.ttl
+```
 
-Useful optional flags:
+Synthetic scaling inputs:
 
-- `--fixed-thesis-mapping`
-- `--weights 2,1,3,1,1,2`
-- `--mark-predicate http://example.org/teaches`
-- `--mark-subject http://example.org/Aristotle`
+```text
+data/scaling/
+```
 
-## Running The Included Experiments
+Local real inputs:
 
-You can also run the thin wrappers in `experiments/`:
+```text
+data/real_kgs/
+```
 
-- `python experiments/exp_basis_running_example.py`
-- `python experiments/exp_amplitude_running_example.py`
-- `python experiments/exp_phase_running_example.py`
+Generate synthetic files with:
 
-These wrappers call the reusable code in `src/` and simply provide default settings for the included thesis example.
+```powershell
+python scripts/generate_scaling_datasets.py
+```
 
-## Using Another Turtle File
+## Scaling
 
-To run the same pipeline on another knowledge graph:
+The profile runner calls the scaling scripts automatically.
 
-1. prepare another RDF file in Turtle format
-2. point the CLI to that file with `--input`
-3. optionally pass custom weights or a phase-marking rule
+For direct synthetic-only scaling:
 
-Example:
+```powershell
+python scripts/run_scaling_experiments.py --sizes 100 1000 --repetitions 1 --shots 1000 --output-dir results\scratch_scaling
+```
 
-`python -m src.main --encoding basis --input path/to/another_graph.ttl`
+For direct synthetic plus real scaling:
 
-The project will automatically rebuild the mappings and required bit widths from the new graph.
+```powershell
+python scripts/run_all_experiments.py --results-root results\scratch_all --synthetic-sizes 100 1000 --repetitions 1 --shots 1000 --timeout-seconds 300
+```
 
-## Outputs
+See `docs/scaling_experiments.md` for scaling details.
 
-The pipeline writes outputs under `results/`:
+## Testing
 
-- `results/logs/` contains JSON logs
-- `results/figures/` contains plots
+Run:
 
-The exact outputs depend on the chosen encoding:
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
 
-- basis: per-triple basis states and an optional superposition summary
-- amplitude: vector details and basis-state probabilities
-- phase: probabilities before and after the mixing step
+The Windows runner also runs tests when the `tests/` folder exists.
 
-The JSON log files also include runtime instrumentation. This means each run records:
+## Failure Handling
 
-- RDF loading and parsing time
-- context/mapping construction time
-- state preparation time
-- statevector simulation time
-- measurement simulation time
-- plotting time
-- log-writing time
-- total runtime of the full program
+The runner records every command in:
 
-## Notes And Limitations
+```text
+command_log.jsonl
+run_manifest.json
+logs/<step>.log
+```
 
-- the current input format is Turtle first
-- the code is structured so more RDF serializations can be added later
-- the phase oracle uses a simple dense diagonal unitary, which is fine for a small thesis demo but not meant for large-scale graphs
-- only local simulation is required; IBM cloud access is not needed
+Every log contains the command, working directory, stdout, stderr, and finish
+time. A failed command records its exit code or timeout reason.
 
-## Regenerating This PDF
+For large experiments, a skipped, timed-out, or simulator-limited row is still a
+valid output row. Do not replace those rows with invented values.
 
-The source for this document is:
+## Adding Code
 
-`docs/manual.md`
+When adding experiments:
 
-The PDF can be regenerated with:
+1. Put reusable logic under `src/`.
+2. Put named task logic under `src/tasks/`.
+3. Add CLI support in `scripts/` when needed.
+4. Write all outputs under `--output-dir`.
+5. Save CSV/JSON for metrics and raw details.
+6. Save PNG for plots or histograms.
+7. Return proper exit codes.
+8. Add tests.
 
-`python3 tools/generate_pdf_manual.py`
+Keep generated outputs inside the active run folder.
