@@ -1,0 +1,21 @@
+﻿
+FullName                                                                                                     Length LastWriteTime      
+--------                                                                                                     ------ -------------      
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\baselines                      7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\chapter9                       7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\chapter9_paper                 7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\chapter9_sequential            7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\figures                        7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\logs                           7/6/2026 8:32:31 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\reports                        7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\scaling                        7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\schema_matching                7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\tables                         7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\tests                          7/6/2026 8:32:19 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\command_log.jsonl       1775   7/6/2026 8:32:28 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\run_manifest.json       716    7/6/2026 8:33:48 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\logs\pip_install.log    12594  7/6/2026 8:33:48 PM
+C:\Users\User\Documents\GitHub\Quskit-KG-Ecodings\results\runs\20260706_203219_light\logs\python_version.log 32     7/6/2026 8:32:19 PM
+
+
+

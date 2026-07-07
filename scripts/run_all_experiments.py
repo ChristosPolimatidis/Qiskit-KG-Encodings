@@ -84,6 +84,12 @@ def build_argument_parser() -> argparse.ArgumentParser:
         help="Per-run timeout. Timed-out runs are recorded and the batch continues.",
     )
     parser.add_argument(
+        "--max-real-triples",
+        type=int,
+        default=None,
+        help="Deterministically truncate each real KG file to this many triples.",
+    )
+    parser.add_argument(
         "--append",
         action="store_true",
         help="Append new rows to existing synthetic/real raw CSVs and rebuild combined outputs.",

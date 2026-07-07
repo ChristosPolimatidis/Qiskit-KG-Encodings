@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 import time
 
 from qiskit import QuantumCircuit, transpile
@@ -15,8 +16,9 @@ from src.running_example import (
 
 
 DEFAULT_SHOTS = 2048
-DEFAULT_GROVER_ITERATIONS = 2
 DEFAULT_SEED_SIMULATOR = 12345
+DEFAULT_SUCCESS_PROBABILITY_THRESHOLD = 0.75
+GROVER_ITERATION_FORMULA = "round((pi / 4) * sqrt(N / M))"
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,6 +33,7 @@ class BasisLookupResult:
     decoded_index: int
     decoded_result: dict[str, str] | None
     counts: dict[str, int]
+    probabilities: dict[str, float]
     task_time_seconds: float
     num_qubits: int
     circuit_depth: int
@@ -41,7 +44,20 @@ class BasisLookupResult:
     shots: int
     backend: str
     grover_iterations: int
+    recommended_grover_iterations: int
+    grover_iteration_formula: str
+    search_space_size: int
+    marked_count: int
     index_mode: str
+    expected_value: float
+    estimated_value: float
+    absolute_error: float
+    relative_error: float
+    pass_threshold: float
+    pass_fail: str
+    threshold_reason: str
+    measurement_mode: str
+    claim_scope: str
     claim_note: str
 
 
@@ -63,6 +79,28 @@ def _apply_multi_controlled_z(circuit: QuantumCircuit) -> None:
     circuit.h(target)
     circuit.mcx(controls, target)
     circuit.h(target)
+
+
+def recommended_grover_iterations(
+    search_space_size: int,
+    marked_count: int = 1,
+) -> int:
+    """Return the standard approximate Grover iteration count.
+
+    The all-marked case does not require amplification, so it returns 0. For
+    all other valid configurations this returns at least one iteration.
+    """
+
+    if search_space_size <= 0:
+        raise ValueError("search_space_size must be greater than 0.")
+    if marked_count <= 0:
+        raise ValueError("marked_count must be greater than 0.")
+    if marked_count > search_space_size:
+        raise ValueError("marked_count must be less than or equal to search_space_size.")
+    if marked_count == search_space_size:
+        return 0
+    estimate = round((math.pi / 4) * math.sqrt(search_space_size / marked_count))
+    return max(1, int(estimate))
 
 
 def apply_index_phase_oracle(circuit: QuantumCircuit, target_bitstring: str) -> None:
@@ -98,14 +136,17 @@ def build_basis_lookup_circuit(
     target_index: int,
     *,
     num_qubits: int = 3,
-    grover_iterations: int = DEFAULT_GROVER_ITERATIONS,
+    grover_iterations: int | None = None,
+    marked_count: int = 1,
 ) -> QuantumCircuit:
     """Build a small Grover-style exact-index lookup circuit."""
 
     if target_index < 0 or target_index >= 2**num_qubits:
         raise ValueError("The target index is outside the circuit index space.")
-    if grover_iterations < 1:
-        raise ValueError("At least one Grover-style iteration is required.")
+    if grover_iterations is None:
+        grover_iterations = recommended_grover_iterations(2**num_qubits, marked_count)
+    if grover_iterations < 0:
+        raise ValueError("Grover-style iterations cannot be negative.")
 
     target_bitstring = _bitstring_for_index(target_index, num_qubits)
     circuit = QuantumCircuit(num_qubits, name="BasisLookupGroverDemo")
@@ -132,13 +173,23 @@ def _most_likely_bitstring(counts: dict[str, int]) -> str:
     return max(counts, key=lambda bitstring: (counts[bitstring], bitstring))
 
 
+def counts_to_probabilities(counts: dict[str, int], shots: int) -> dict[str, float]:
+    if shots < 1:
+        raise ValueError("shots must be at least 1.")
+    return {
+        bitstring: count / shots
+        for bitstring, count in sorted(counts.items())
+    }
+
+
 def run_basis_lookup_task(
     *,
     target_triple: TripleRecord | None = None,
     target_index: int | None = None,
     shots: int = DEFAULT_SHOTS,
-    grover_iterations: int = DEFAULT_GROVER_ITERATIONS,
+    grover_iterations: int | None = None,
     seed_simulator: int = DEFAULT_SEED_SIMULATOR,
+    success_probability_threshold: float = DEFAULT_SUCCESS_PROBABILITY_THRESHOLD,
 ) -> BasisLookupResult:
     """Run the Chapter 9 basis/index lookup validation task.
 
@@ -168,13 +219,25 @@ def run_basis_lookup_task(
         selected_target_triple = index_to_triple[target_index]
 
     num_qubits = 3
-    if 2**num_qubits != SEQUENTIAL_INDEX_DIMENSION:
+    search_space_size = 2**num_qubits
+    marked_count = 1
+    recommended_iterations = recommended_grover_iterations(
+        search_space_size=search_space_size,
+        marked_count=marked_count,
+    )
+    selected_iterations = (
+        recommended_iterations
+        if grover_iterations is None
+        else grover_iterations
+    )
+    if search_space_size != SEQUENTIAL_INDEX_DIMENSION:
         raise ValueError("The sequential running-example dimension must be 8.")
 
     circuit = build_basis_lookup_circuit(
         target_index=selected_target_index,
         num_qubits=num_qubits,
-        grover_iterations=grover_iterations,
+        grover_iterations=selected_iterations,
+        marked_count=marked_count,
     )
     measured_circuit = circuit.copy()
     measured_circuit.measure_all()
@@ -183,6 +246,7 @@ def run_basis_lookup_task(
     transpiled_circuit = transpile(measured_circuit, simulator, optimization_level=0)
     result = simulator.run(transpiled_circuit, shots=shots).result()
     counts = dict(sorted(result.get_counts().items()))
+    probabilities = counts_to_probabilities(counts, shots)
 
     most_likely_bitstring = _most_likely_bitstring(counts)
     decoded_index = int(most_likely_bitstring, 2)
@@ -191,6 +255,15 @@ def run_basis_lookup_task(
         _bitstring_for_index(selected_target_index, num_qubits),
         0,
     ) / shots
+    expected_value = 1.0
+    estimated_value = success_probability
+    absolute_error = abs(expected_value - estimated_value)
+    relative_error = absolute_error / expected_value
+    pass_fail = (
+        "pass"
+        if success_probability >= success_probability_threshold
+        else "fail"
+    )
     task_time_seconds = time.perf_counter() - task_start
 
     return BasisLookupResult(
@@ -206,6 +279,7 @@ def run_basis_lookup_task(
         decoded_index=decoded_index,
         decoded_result=decoded_result,
         counts=counts,
+        probabilities=probabilities,
         task_time_seconds=task_time_seconds,
         num_qubits=num_qubits,
         circuit_depth=circuit.depth(),
@@ -215,8 +289,24 @@ def run_basis_lookup_task(
         success_probability=success_probability,
         shots=shots,
         backend="AerSimulator",
-        grover_iterations=grover_iterations,
+        grover_iterations=selected_iterations,
+        recommended_grover_iterations=recommended_iterations,
+        grover_iteration_formula=GROVER_ITERATION_FORMULA,
+        search_space_size=search_space_size,
+        marked_count=marked_count,
         index_mode="sequential",
+        expected_value=expected_value,
+        estimated_value=estimated_value,
+        absolute_error=absolute_error,
+        relative_error=relative_error,
+        pass_threshold=success_probability_threshold,
+        pass_fail=pass_fail,
+        threshold_reason=(
+            "Target bitstring success probability must be at least "
+            f"{success_probability_threshold:.2f} for the toy Grover lookup."
+        ),
+        measurement_mode="shot-based computational-basis readout",
+        claim_scope="implementation-level validation; no quantum-advantage claim",
         claim_note=(
             "This is a sequential-only validation task for basis/index "
             "encoding. It stays in the compact 3-qubit sequential index space "

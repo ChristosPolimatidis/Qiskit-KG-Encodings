@@ -45,6 +45,7 @@ from src.running_example import (
 from src.tasks.amplitude_similarity import run_amplitude_similarity_task
 from src.tasks.basis_lookup import run_basis_lookup_task
 from src.tasks.combined_demo import run_combined_demo_task
+from src.tasks.keyword_search import run_keyword_search_task
 from src.tasks.link_prediction_distance import run_link_prediction_distance_task
 from src.tasks.multihop_phase_kickback import run_multihop_phase_kickback_task
 from src.tasks.schema_matching_qft import run_schema_matching_qft_task
@@ -93,6 +94,15 @@ USAGE_TABLE_FIELDS = [
 
 USAGE_LATEX_FIELDS = USAGE_TABLE_FIELDS
 
+VALIDATION_TABLE_FIELDS = [
+    "KG Task",
+    "Validation Metric",
+    "Value",
+    "Notes",
+]
+
+VALIDATION_LATEX_FIELDS = VALIDATION_TABLE_FIELDS
+
 TABLE6_CIRCUIT_FIELDS = [
     "Task",
     "Encoding",
@@ -104,6 +114,96 @@ TABLE6_CIRCUIT_FIELDS = [
     "Transpiled Gate Count",
     "Shots",
     "Repetitions",
+    "Measurement Mode",
+    "Grover Iterations",
+    "Claim Scope",
+]
+
+PER_REPETITION_FIELDS = [
+    "group",
+    "task",
+    "experiment",
+    "repetition",
+    "index_mode",
+    "backend",
+    "measurement_mode",
+    "status",
+    "shots",
+    "num_qubits",
+    "circuit_depth",
+    "gate_count",
+    "transpiled_depth",
+    "transpiled_gate_count",
+    "task_time_seconds",
+    "state_preparation_time_seconds",
+    "simulation_time_seconds",
+    "measurement_time_seconds",
+    "readout_decoding_time_seconds",
+    "primary_metric",
+    "primary_value",
+    "expected_value",
+    "estimated_value",
+    "absolute_error",
+    "relative_error",
+    "pass_threshold",
+    "pass_fail",
+    "threshold_reason",
+    "recommended_grover_iterations",
+    "grover_iterations",
+    "search_space_size",
+    "marked_count",
+    "claim_scope",
+    "notes",
+]
+
+SCORE_DERIVATION_FIELDS = [
+    "task",
+    "repetition",
+    "score_name",
+    "expected_value",
+    "estimated_value",
+    "exact_or_classical_value",
+    "formula",
+    "counts_source",
+    "shots",
+    "absolute_error",
+    "relative_error",
+    "pass_threshold",
+    "pass_fail",
+    "threshold_reason",
+]
+
+THRESHOLD_FIELDS = [
+    "task",
+    "repetition",
+    "expected_value",
+    "estimated_value",
+    "absolute_error",
+    "relative_error",
+    "pass_threshold",
+    "pass_fail",
+    "threshold_reason",
+]
+
+SUITABILITY_FIELDS = [
+    "task",
+    "encoding",
+    "measurement_mode",
+    "qubits",
+    "state_preparation_time_seconds",
+    "circuit_construction_time_seconds",
+    "simulation_time_seconds",
+    "measurement_time_seconds",
+    "readout_decoding_time_seconds",
+    "circuit_depth",
+    "gate_count",
+    "transpiled_depth",
+    "transpiled_gate_count",
+    "shots",
+    "error_against_exact_or_classical",
+    "pass_fail",
+    "notes",
+    "claim_scope",
 ]
 
 SYNTHETIC_ENCODINGS = ("basis", "amplitude", "phase", "combined")
@@ -177,6 +277,7 @@ REAL_LATEX_FIELDS = [
 TABLE1_TASK_ORDER = [
     "search_grover_lookup",
     "entity_matching_swap_test",
+    "keyword_search_swap_test",
     "link_prediction_distance_estimation",
     "multihop_phase_kickback",
     "schema_matching_qft",
@@ -185,6 +286,7 @@ TABLE1_TASK_ORDER = [
 TABLE1_TASK_LABELS = {
     "search_grover_lookup": ("Search", "Basis", "Grover lookup"),
     "entity_matching_swap_test": ("Entity Matching", "Amplitude", "Swap Test"),
+    "keyword_search_swap_test": ("Keyword Search", "Amplitude", "Swap Test"),
     "link_prediction_distance_estimation": (
         "Link Prediction",
         "Amplitude",
@@ -658,6 +760,22 @@ def usage_row(
     primary_value: float | int | None,
     notes: str,
 ) -> dict[str, Any]:
+    expected_value = getattr(result, "expected_value", None)
+    if expected_value is None:
+        expected_value = getattr(result, "classical_similarity", None)
+    if expected_value is None:
+        expected_value = getattr(result, "exact_statevector_quantity", None)
+    if expected_value is None:
+        expected_value = getattr(result, "exact_distribution_similarity", None)
+
+    estimated_value = getattr(result, "estimated_value", None)
+    if estimated_value is None:
+        estimated_value = getattr(result, "estimated_similarity", None)
+    if estimated_value is None:
+        estimated_value = getattr(result, "shot_based_estimate", None)
+    if estimated_value is None:
+        estimated_value = getattr(result, "measured_distribution_similarity", None)
+
     row = {
         "group": "usage_task",
         "task": task,
@@ -674,6 +792,36 @@ def usage_row(
         "transpiled_gate_count": getattr(result, "transpiled_gate_count", None),
         "primary_metric": primary_metric,
         "primary_value": primary_value,
+        "measurement_mode": getattr(result, "measurement_mode", ""),
+        "claim_scope": getattr(result, "claim_scope", ""),
+        "expected_value": expected_value,
+        "estimated_value": estimated_value,
+        "absolute_error": getattr(result, "absolute_error", None),
+        "relative_error": getattr(result, "relative_error", None),
+        "pass_threshold": getattr(result, "pass_threshold", None),
+        "pass_fail": getattr(result, "pass_fail", ""),
+        "threshold_reason": getattr(result, "threshold_reason", ""),
+        "state_preparation_time_seconds": getattr(
+            result,
+            "state_preparation_time_seconds",
+            None,
+        ),
+        "simulation_time_seconds": getattr(result, "simulation_time_seconds", None),
+        "measurement_time_seconds": getattr(result, "measurement_time_seconds", None),
+        "readout_decoding_time_seconds": getattr(
+            result,
+            "readout_decoding_time_seconds",
+            None,
+        ),
+        "recommended_grover_iterations": getattr(
+            result,
+            "recommended_grover_iterations",
+            None,
+        ),
+        "grover_iterations": getattr(result, "grover_iterations", None),
+        "grover_iteration_formula": getattr(result, "grover_iteration_formula", ""),
+        "search_space_size": getattr(result, "search_space_size", None),
+        "marked_count": getattr(result, "marked_count", None),
         "notes": notes,
         "result": result,
     }
@@ -727,6 +875,31 @@ def run_usage_tasks(args: argparse.Namespace) -> list[dict[str, Any]]:
             )
         )
 
+        keyword_result = run_keyword_search_task(
+            shots=args.shots,
+            seed_simulator=seed + 15_000,
+            repetitions=args.repetitions,
+        )
+        rows.append(
+            usage_row(
+                task="keyword_search_swap_test",
+                repetition=repetition,
+                index_mode="feature_vector",
+                backend=args.backend,
+                shots=args.shots,
+                status="success",
+                result=keyword_result,
+                primary_metric="top_score",
+                primary_value=keyword_result.top_score,
+                notes=(
+                    f"top result = {keyword_result.top_result}; small "
+                    "keyword-search validation over the running example using "
+                    "amplitude encoding and a swap test; not a full RDF keyword "
+                    "search engine."
+                ),
+            )
+        )
+
         link_result = run_link_prediction_distance_task(
             shots=args.shots,
             seed_simulator=seed + 20_000,
@@ -749,39 +922,46 @@ def run_usage_tasks(args: argparse.Namespace) -> list[dict[str, Any]]:
             )
         )
 
-        multihop_result = run_multihop_phase_kickback_task()
+        multihop_result = run_multihop_phase_kickback_task(
+            shots=args.shots,
+            seed_simulator=seed + 30_000,
+        )
         rows.append(
             usage_row(
                 task="multihop_phase_kickback",
                 repetition=repetition,
                 index_mode="path_phase",
-                backend="statevector",
-                shots=0,
+                backend=args.backend,
+                shots=args.shots,
                 status="success",
                 result=multihop_result,
-                primary_metric="phase error",
-                primary_value=multihop_result.phase_error,
+                primary_metric="shot phase error",
+                primary_value=multihop_result.shot_phase_error,
                 notes=(
-                    "Two-hop phase accumulation with controlled phase operations; "
-                    "not a full RDFS reasoner."
+                    "Two-hop phase accumulation with exact statevector and "
+                    "shot-based X/Y Hadamard-test validation; not a full RDFS reasoner."
                 ),
             )
         )
 
-        schema_result = run_schema_matching_qft_task()
+        schema_result = run_schema_matching_qft_task(
+            shots=args.shots,
+            seed_simulator=seed + 40_000,
+        )
         rows.append(
             usage_row(
                 task="schema_matching_qft",
                 repetition=repetition,
                 index_mode="phase_pattern",
-                backend="statevector",
-                shots=0,
+                backend=args.backend,
+                shots=args.shots,
                 status="success",
                 result=schema_result,
-                primary_metric="Fourier similarity",
-                primary_value=schema_result.fourier_pattern_similarity,
+                primary_metric="measured Fourier similarity",
+                primary_value=schema_result.measured_distribution_similarity,
                 notes=(
-                    "Toy schema-pattern validation using QFT magnitude signatures; "
+                    "Toy schema-pattern validation using measured QFT distributions "
+                    "with exact-URI, synonym-dictionary, and negative-control assumptions; "
                     "not full schema matching."
                 ),
             )
@@ -911,6 +1091,16 @@ def summarize_usage_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "mean_transpiled_gate_count": mean_or_blank(group, "transpiled_gate_count"),
                 "primary_metric": first_value(group, "primary_metric"),
                 "mean_primary_value": mean_or_blank(group, "primary_value"),
+                "measurement_mode": first_value(group, "measurement_mode"),
+                "claim_scope": first_value(group, "claim_scope"),
+                "pass_fail": first_value(group, "pass_fail"),
+                "mean_absolute_error": mean_or_blank(group, "absolute_error"),
+                "mean_pass_threshold": mean_or_blank(group, "pass_threshold"),
+                "recommended_grover_iterations": first_value(
+                    group,
+                    "recommended_grover_iterations",
+                ),
+                "grover_iterations": first_value(group, "grover_iterations"),
                 "notes": first_value(group, "notes"),
             }
         )
@@ -1066,6 +1256,39 @@ def paper_usage_table_rows(summary_rows: list[dict[str, Any]]) -> list[dict[str,
     return rows
 
 
+def validation_metric_table_rows(
+    usage_rows: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for task_id in TABLE1_TASK_ORDER:
+        group = [row for row in usage_rows if row.get("task") == task_id]
+        if not group:
+            continue
+
+        values = numeric_values(group, "primary_value")
+        mean_value = statistics.mean(values) if values else ""
+        task, _, _ = TABLE1_TASK_LABELS[task_id]
+        first_result = group[0].get("result")
+        notes = compact_note(group[0].get("notes"), max_length=96)
+
+        if task_id == "keyword_search_swap_test" and first_result is not None:
+            notes = compact_note(
+                f"top result = {getattr(first_result, 'top_result', '')}; "
+                "small running-example keyword-search validation",
+                max_length=96,
+            )
+
+        rows.append(
+            {
+                "KG Task": task,
+                "Validation Metric": str(group[0].get("primary_metric") or ""),
+                "Value": number_or_blank(mean_value),
+                "Notes": notes,
+            }
+        )
+    return rows
+
+
 def circuit_statistics_table_rows(
     summary_rows: list[dict[str, Any]],
 ) -> list[dict[str, str]]:
@@ -1095,6 +1318,9 @@ def circuit_statistics_table_rows(
                 ),
                 "Shots": shots_or_zero(row.get("shots")),
                 "Repetitions": number_or_dash(row.get("run_count")),
+                "Measurement Mode": compact_note(row.get("measurement_mode"), 44),
+                "Grover Iterations": number_or_dash(row.get("grover_iterations")),
+                "Claim Scope": compact_note(row.get("claim_scope"), 44),
             }
         )
     return rows
@@ -1924,18 +2150,648 @@ def write_json(payload: dict[str, Any], output_path: Path) -> None:
     )
 
 
+def probability_rows(counts: dict[str, int], shots: int) -> list[dict[str, Any]]:
+    if shots < 1:
+        return []
+    return [
+        {
+            "outcome": outcome,
+            "count": count,
+            "probability": count / shots,
+        }
+        for outcome, count in sorted(counts.items())
+    ]
+
+
+def slugify(value: Any) -> str:
+    text = str(value or "item").lower()
+    cleaned = [
+        char if char.isalnum() else "_"
+        for char in text
+    ]
+    slug = "".join(cleaned).strip("_")
+    while "__" in slug:
+        slug = slug.replace("__", "_")
+    return slug or "item"
+
+
+def histogram_filename(task: str, name: str) -> str:
+    if task == "search_grover_lookup":
+        return "hist_basis_lookup.png"
+    if task == "entity_matching_swap_test":
+        return "hist_entity_matching_swap_test.png"
+    if task == "keyword_search_swap_test":
+        return f"hist_keyword_search_{slugify(name)}.png"
+    if task == "link_prediction_distance_estimation":
+        return "hist_link_prediction_distance.png"
+    if task == "multihop_phase_kickback":
+        return (
+            "hist_multihop_phase.png"
+            if name == "x_quadrature"
+            else f"hist_multihop_phase_{slugify(name)}.png"
+        )
+    if task == "schema_matching_qft":
+        if name == "pattern_a":
+            return "hist_schema_qft_pattern_a.png"
+        if name == "pattern_b":
+            return "hist_schema_qft_pattern_b.png"
+        return f"hist_schema_qft_{slugify(name)}.png"
+    return f"hist_{slugify(task)}_{slugify(name)}.png"
+
+
+def result_count_sets(task: str, result: Any) -> list[tuple[str, dict[str, int]]]:
+    if result is None:
+        return []
+    count_sets: list[tuple[str, dict[str, int]]] = []
+    counts_by_entity = getattr(result, "counts_by_entity", None)
+    if isinstance(counts_by_entity, dict):
+        for entity, counts in counts_by_entity.items():
+            count_sets.append((str(entity), dict(counts)))
+        return count_sets
+    if hasattr(result, "counts_x") and hasattr(result, "counts_y"):
+        count_sets.append(("x_quadrature", dict(getattr(result, "counts_x"))))
+        count_sets.append(("y_quadrature", dict(getattr(result, "counts_y"))))
+        return count_sets
+    if hasattr(result, "counts_pattern_a") and hasattr(result, "counts_pattern_b"):
+        count_sets.append(("pattern_a", dict(getattr(result, "counts_pattern_a"))))
+        count_sets.append(("pattern_b", dict(getattr(result, "counts_pattern_b"))))
+        return count_sets
+    counts = getattr(result, "counts", None)
+    if isinstance(counts, dict):
+        count_sets.append(("main", dict(counts)))
+    return count_sets
+
+
+def save_histogram_figure(
+    counts: dict[str, int],
+    *,
+    title: str,
+    output_path: Path,
+) -> Path | None:
+    try:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception:
+        return None
+    if not counts:
+        return None
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    labels = list(sorted(counts))
+    values = [counts[label] for label in labels]
+    fig, ax = plt.subplots(figsize=(max(5.8, 0.72 * len(labels)), 3.8))
+    ax.bar(labels, values, color="#2f6f6d")
+    ax.set_title(title)
+    ax.set_xlabel("Measured bitstring")
+    ax.set_ylabel("Counts")
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
+    return output_path
+
+
+def build_per_repetition_rows(
+    encoding_rows: list[dict[str, Any]],
+    usage_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in encoding_rows:
+        rows.append(
+            {
+                "group": row.get("group"),
+                "experiment": row.get("experiment"),
+                "repetition": row.get("repetition"),
+                "index_mode": row.get("index_mode"),
+                "backend": row.get("backend"),
+                "status": row.get("status"),
+                "num_qubits": row.get("num_qubits"),
+                "circuit_depth": row.get("circuit_depth"),
+                "gate_count": row.get("gate_count"),
+                "transpiled_depth": row.get("transpiled_depth"),
+                "transpiled_gate_count": row.get("transpiled_gate_count"),
+                "task_time_seconds": row.get("task_time_seconds"),
+                "state_preparation_time_seconds": row.get("preparation_time_seconds"),
+                "notes": row.get("notes"),
+            }
+        )
+    for row in usage_rows:
+        rows.append(
+            {
+                field: row.get(field)
+                for field in PER_REPETITION_FIELDS
+            }
+        )
+    return rows
+
+
+def score_derivation_rows(usage_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in usage_rows:
+        task = str(row.get("task") or "")
+        result = row.get("result")
+        repetition = row.get("repetition")
+        shots = row.get("shots")
+        if task == "search_grover_lookup":
+            rows.append(
+                {
+                    "task": task,
+                    "repetition": repetition,
+                    "score_name": "target_success_probability",
+                    "expected_value": 1.0,
+                    "estimated_value": getattr(result, "success_probability", None),
+                    "exact_or_classical_value": 1.0,
+                    "formula": "target_bitstring_count / shots",
+                    "counts_source": "counts",
+                    "shots": shots,
+                    "absolute_error": getattr(result, "absolute_error", None),
+                    "relative_error": getattr(result, "relative_error", None),
+                    "pass_threshold": getattr(result, "pass_threshold", None),
+                    "pass_fail": getattr(result, "pass_fail", ""),
+                    "threshold_reason": getattr(result, "threshold_reason", ""),
+                }
+            )
+        elif task in {
+            "entity_matching_swap_test",
+            "link_prediction_distance_estimation",
+        }:
+            rows.append(
+                {
+                    "task": task,
+                    "repetition": repetition,
+                    "score_name": "swap_test_squared_similarity",
+                    "expected_value": getattr(result, "classical_similarity", None),
+                    "estimated_value": getattr(result, "estimated_similarity", None),
+                    "exact_or_classical_value": getattr(
+                        result,
+                        "classical_similarity",
+                        None,
+                    ),
+                    "formula": "max(0, min(1, 2 * Pr(ancilla=0) - 1))",
+                    "counts_source": "counts",
+                    "shots": shots,
+                    "absolute_error": getattr(result, "absolute_error", None),
+                    "relative_error": getattr(result, "relative_error", None),
+                    "pass_threshold": getattr(result, "pass_threshold", None),
+                    "pass_fail": getattr(result, "pass_fail", ""),
+                    "threshold_reason": getattr(result, "threshold_reason", ""),
+                }
+            )
+        elif task == "keyword_search_swap_test":
+            estimated_scores = getattr(result, "estimated_scores", {})
+            classical_scores = getattr(result, "classical_scores", {})
+            absolute_errors = getattr(result, "absolute_errors", {})
+            for entity, estimated_score in estimated_scores.items():
+                rows.append(
+                    {
+                        "task": task,
+                        "repetition": repetition,
+                        "score_name": f"keyword_score:{entity}",
+                        "expected_value": classical_scores.get(entity),
+                        "estimated_value": estimated_score,
+                        "exact_or_classical_value": classical_scores.get(entity),
+                        "formula": "max(0, min(1, 2 * Pr(ancilla=0) - 1))",
+                        "counts_source": f"counts_by_entity:{entity}",
+                        "shots": shots,
+                        "absolute_error": absolute_errors.get(entity),
+                        "relative_error": "",
+                        "pass_threshold": getattr(result, "pass_threshold", None),
+                        "pass_fail": getattr(result, "pass_fail", ""),
+                        "threshold_reason": getattr(result, "threshold_reason", ""),
+                    }
+                )
+        elif task == "multihop_phase_kickback":
+            rows.append(
+                {
+                    "task": task,
+                    "repetition": repetition,
+                    "score_name": "wrapped_phase_estimate",
+                    "expected_value": getattr(result, "expected_composed_phase", None),
+                    "estimated_value": getattr(result, "estimated_phase", None),
+                    "exact_or_classical_value": getattr(
+                        result,
+                        "observed_composed_phase",
+                        None,
+                    ),
+                    "formula": "atan2(2*Pr_y(0)-1, 2*Pr_x(0)-1) modulo 2*pi",
+                    "counts_source": "counts_x/counts_y",
+                    "shots": shots,
+                    "absolute_error": getattr(result, "shot_phase_error", None),
+                    "relative_error": getattr(result, "relative_error", None),
+                    "pass_threshold": getattr(result, "pass_threshold", None),
+                    "pass_fail": getattr(result, "pass_fail", ""),
+                    "threshold_reason": getattr(result, "threshold_reason", ""),
+                }
+            )
+        elif task == "schema_matching_qft":
+            rows.append(
+                {
+                    "task": task,
+                    "repetition": repetition,
+                    "score_name": "measured_qft_distribution_similarity",
+                    "expected_value": getattr(
+                        result,
+                        "exact_distribution_similarity",
+                        None,
+                    ),
+                    "estimated_value": getattr(
+                        result,
+                        "measured_distribution_similarity",
+                        None,
+                    ),
+                    "exact_or_classical_value": getattr(
+                        result,
+                        "fourier_pattern_similarity",
+                        None,
+                    ),
+                    "formula": "cosine_similarity(measured_probabilities_a, measured_probabilities_b)",
+                    "counts_source": "counts_pattern_a/counts_pattern_b",
+                    "shots": shots,
+                    "absolute_error": getattr(result, "absolute_error", None),
+                    "relative_error": getattr(result, "relative_error", None),
+                    "pass_threshold": getattr(result, "pass_threshold", None),
+                    "pass_fail": getattr(result, "pass_fail", ""),
+                    "threshold_reason": getattr(result, "threshold_reason", ""),
+                }
+            )
+    return rows
+
+
+def validation_threshold_rows(usage_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "task": row.get("task"),
+            "repetition": row.get("repetition"),
+            "expected_value": row.get("expected_value"),
+            "estimated_value": row.get("estimated_value"),
+            "absolute_error": row.get("absolute_error"),
+            "relative_error": row.get("relative_error"),
+            "pass_threshold": row.get("pass_threshold"),
+            "pass_fail": row.get("pass_fail"),
+            "threshold_reason": row.get("threshold_reason"),
+        }
+        for row in usage_rows
+    ]
+
+
+def suitability_metric_rows(usage_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in usage_rows:
+        task_label, encoding, _method = TABLE1_TASK_LABELS.get(
+            str(row.get("task")),
+            (str(row.get("task") or ""), "", ""),
+        )
+        rows.append(
+            {
+                "task": task_label,
+                "encoding": encoding,
+                "measurement_mode": row.get("measurement_mode"),
+                "qubits": row.get("num_qubits"),
+                "state_preparation_time_seconds": row.get(
+                    "state_preparation_time_seconds"
+                ),
+                "circuit_construction_time_seconds": "",
+                "simulation_time_seconds": row.get("simulation_time_seconds"),
+                "measurement_time_seconds": row.get("measurement_time_seconds"),
+                "readout_decoding_time_seconds": row.get(
+                    "readout_decoding_time_seconds"
+                ),
+                "circuit_depth": row.get("circuit_depth"),
+                "gate_count": row.get("gate_count"),
+                "transpiled_depth": row.get("transpiled_depth"),
+                "transpiled_gate_count": row.get("transpiled_gate_count"),
+                "shots": row.get("shots"),
+                "error_against_exact_or_classical": row.get("absolute_error"),
+                "pass_fail": row.get("pass_fail"),
+                "notes": row.get("notes"),
+                "claim_scope": row.get("claim_scope"),
+            }
+        )
+    return rows
+
+
+def write_simple_markdown_table(
+    rows: list[dict[str, Any]],
+    fields: list[str],
+    output_path: Path,
+    *,
+    title: str,
+    intro: str,
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"# {title}",
+        "",
+        intro,
+        "",
+        "| " + " | ".join(fields) + " |",
+        "| " + " | ".join("---" for _ in fields) + " |",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            + " | ".join(str(row.get(field, "")) for field in fields)
+            + " |"
+        )
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return output_path
+
+
+def write_schema_matching_artifacts(
+    usage_rows: list[dict[str, Any]],
+    output_dir: Path,
+) -> dict[str, Path | None]:
+    schema_rows = [
+        row
+        for row in usage_rows
+        if row.get("task") == "schema_matching_qft"
+    ]
+    schema_dir = output_dir / "schema_matching"
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    if not schema_rows:
+        return {
+            "schema_phase_assignments": None,
+            "schema_matching_raw": None,
+            "schema_matching_negative_control": None,
+        }
+
+    assignment_rows: list[dict[str, Any]] = []
+    negative_rows: list[dict[str, Any]] = []
+    raw_payload: list[dict[str, Any]] = []
+    for row in schema_rows:
+        result = row.get("result")
+        result_payload = json_safe(result)
+        raw_payload.append(
+            {
+                "repetition": row.get("repetition"),
+                "result": result_payload,
+            }
+        )
+        strategy_results = getattr(result, "strategy_results", {})
+        for strategy, strategy_payload in strategy_results.items():
+            for assignment in strategy_payload.get("phase_assignments", []):
+                assignment_row = dict(assignment)
+                assignment_row["repetition"] = row.get("repetition")
+                assignment_rows.append(assignment_row)
+        negative_control = getattr(result, "negative_control", {})
+        negative_rows.append(
+            {
+                "repetition": row.get("repetition"),
+                "strategy": "negative_control",
+                "measured_distribution_similarity": negative_control.get(
+                    "measured_distribution_similarity"
+                ),
+                "exact_distribution_similarity": negative_control.get(
+                    "exact_distribution_similarity"
+                ),
+                "absolute_error": negative_control.get("absolute_error"),
+                "assumption": "no semantic prior is available",
+            }
+        )
+
+    assignments_path = schema_dir / "schema_phase_assignments.csv"
+    negative_path = schema_dir / "schema_matching_negative_control.csv"
+    raw_path = schema_dir / "schema_matching_raw.json"
+    write_csv(
+        assignment_rows,
+        assignments_path,
+        [
+            "repetition",
+            "strategy",
+            "relation",
+            "canonical_relation",
+            "phase",
+            "assumption",
+        ],
+    )
+    write_csv(
+        negative_rows,
+        negative_path,
+        [
+            "repetition",
+            "strategy",
+            "measured_distribution_similarity",
+            "exact_distribution_similarity",
+            "absolute_error",
+            "assumption",
+        ],
+    )
+    write_json({"schema_matching_results": raw_payload}, raw_path)
+    return {
+        "schema_phase_assignments": assignments_path,
+        "schema_matching_raw": raw_path,
+        "schema_matching_negative_control": negative_path,
+    }
+
+
+def write_chapter9_validation_report(
+    *,
+    output_path: Path,
+    args: argparse.Namespace,
+    usage_rows: list[dict[str, Any]],
+    artifact_paths: dict[str, Any],
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    threshold_rows = validation_threshold_rows(usage_rows)
+    passed = sum(1 for row in threshold_rows if row.get("pass_fail") == "pass")
+    failed = sum(1 for row in threshold_rows if row.get("pass_fail") == "fail")
+    lines = [
+        "# Chapter 9 Validation Summary",
+        "",
+        (
+            "This report records implementation-level validation evidence. "
+            "It does not claim quantum advantage."
+        ),
+        "",
+        "## Settings",
+        "",
+        f"- Shots: `{args.shots}`",
+        f"- Repetitions: `{args.repetitions}`",
+        f"- Index mode: `{args.index_mode}`",
+        f"- Seed: `{args.seed}`",
+        "",
+        "## Threshold Summary",
+        "",
+        f"- Passed task rows: `{passed}`",
+        f"- Failed task rows: `{failed}`",
+        "",
+        "## Task Evidence",
+        "",
+    ]
+    for row in usage_rows:
+        result = row.get("result")
+        lines.extend(
+            [
+                f"### {row.get('task')}",
+                "",
+                f"- Repetition: `{row.get('repetition')}`",
+                f"- Measurement mode: `{row.get('measurement_mode')}`",
+                f"- Shots: `{row.get('shots')}`",
+                f"- Expected value: `{row.get('expected_value')}`",
+                f"- Estimated value: `{row.get('estimated_value')}`",
+                f"- Absolute error: `{row.get('absolute_error')}`",
+                f"- Threshold: `{row.get('pass_threshold')}`",
+                f"- Pass/fail: `{row.get('pass_fail')}`",
+                f"- Claim scope: `{row.get('claim_scope')}`",
+                f"- Raw result fields: `{', '.join(sorted(json_safe(result).keys())) if result else ''}`",
+                "",
+            ]
+        )
+    lines.extend(["## Artifact Paths", ""])
+    for key, value in sorted(artifact_paths.items()):
+        if isinstance(value, list):
+            for item in value:
+                lines.append(f"- `{key}`: `{item}`")
+        elif value not in (None, ""):
+            lines.append(f"- `{key}`: `{value}`")
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return output_path
+
+
+def write_validation_artifacts(
+    *,
+    output_dir: Path,
+    args: argparse.Namespace,
+    encoding_rows: list[dict[str, Any]],
+    usage_rows: list[dict[str, Any]],
+) -> tuple[dict[str, Any], list[Path]]:
+    raw_counts_dir = output_dir / "raw_counts"
+    reports_dir = output_dir / "reports"
+    figures_dir = output_dir / "figures"
+    raw_counts_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    figures: list[Path] = []
+    count_artifacts: list[Path] = []
+    for row in usage_rows:
+        task = str(row.get("task") or "")
+        repetition = int(row.get("repetition") or 0)
+        shots = int(row.get("shots") or 0)
+        result = row.get("result")
+        for name, counts in result_count_sets(task, result):
+            stem = f"{slugify(task)}_rep{repetition}_{slugify(name)}"
+            counts_path = raw_counts_dir / f"{stem}_counts.json"
+            probabilities_path = raw_counts_dir / f"{stem}_probabilities.csv"
+            write_json(
+                {
+                    "task": task,
+                    "repetition": repetition,
+                    "count_set": name,
+                    "shots": shots,
+                    "counts": counts,
+                    "probabilities": {
+                        item["outcome"]: item["probability"]
+                        for item in probability_rows(counts, shots)
+                    },
+                },
+                counts_path,
+            )
+            write_csv(
+                probability_rows(counts, shots),
+                probabilities_path,
+                ["outcome", "count", "probability"],
+            )
+            count_artifacts.extend([counts_path, probabilities_path])
+            figure_path = figures_dir / histogram_filename(task, name)
+            created = save_histogram_figure(
+                counts,
+                title=f"{task} ({name}) measurement counts",
+                output_path=figure_path,
+            )
+            if created is not None and created not in figures:
+                figures.append(created)
+
+    per_repetition_path = output_dir / "chapter9_per_repetition.csv"
+    derivation_path = output_dir / "chapter9_score_derivations.csv"
+    thresholds_path = output_dir / "chapter9_validation_thresholds.csv"
+    suitability_csv_path = reports_dir / "encoding_suitability_metrics.csv"
+    suitability_md_path = reports_dir / "encoding_suitability_metrics.md"
+    validation_md_path = reports_dir / "chapter9_validation.md"
+    validation_json_path = reports_dir / "chapter9_validation.json"
+
+    per_repetition = build_per_repetition_rows(encoding_rows, usage_rows)
+    derivations = score_derivation_rows(usage_rows)
+    thresholds = validation_threshold_rows(usage_rows)
+    suitability_rows = suitability_metric_rows(usage_rows)
+    schema_paths = write_schema_matching_artifacts(usage_rows, output_dir)
+
+    write_csv(per_repetition, per_repetition_path, PER_REPETITION_FIELDS)
+    write_csv(derivations, derivation_path, SCORE_DERIVATION_FIELDS)
+    write_csv(thresholds, thresholds_path, THRESHOLD_FIELDS)
+    write_csv(suitability_rows, suitability_csv_path, SUITABILITY_FIELDS)
+    write_simple_markdown_table(
+        suitability_rows,
+        [
+            "task",
+            "encoding",
+            "measurement_mode",
+            "qubits",
+            "shots",
+            "error_against_exact_or_classical",
+            "pass_fail",
+            "claim_scope",
+        ],
+        suitability_md_path,
+        title="Encoding Suitability Metrics",
+        intro=(
+            "Relative implementation-level metrics for the implemented tasks. "
+            "These rows compare encodings within this codebase and do not "
+            "claim absolute superiority or quantum advantage."
+        ),
+    )
+
+    artifact_paths: dict[str, Any] = {
+        "per_repetition": per_repetition_path,
+        "score_derivations": derivation_path,
+        "validation_thresholds": thresholds_path,
+        "raw_counts_dir": raw_counts_dir,
+        "raw_count_artifacts": count_artifacts,
+        "encoding_suitability_metrics_csv": suitability_csv_path,
+        "encoding_suitability_metrics_md": suitability_md_path,
+        **schema_paths,
+    }
+    write_chapter9_validation_report(
+        output_path=validation_md_path,
+        args=args,
+        usage_rows=usage_rows,
+        artifact_paths=artifact_paths,
+    )
+    write_json(
+        {
+            "settings": vars(args),
+            "thresholds": thresholds,
+            "score_derivations": derivations,
+            "suitability_metrics": suitability_rows,
+            "artifact_paths": artifact_paths,
+        },
+        validation_json_path,
+    )
+    artifact_paths["chapter9_validation_md"] = validation_md_path
+    artifact_paths["chapter9_validation_json"] = validation_json_path
+    return artifact_paths, figures
+
+
 def collect_generated_tables(output_files: dict[str, Any]) -> list[str]:
     table_keys = [
         "table3_encoding_process",
         "table3_encoding_process_tex",
         "table4_usage_tasks",
         "table4_usage_tasks_tex",
+        "table5_validation_metrics",
+        "table5_validation_metrics_tex",
         "table6_circuit_statistics",
         "table6_circuit_statistics_tex",
         "table7_synthetic_results",
         "table7_synthetic_results_tex",
         "table8_real_kg_results",
         "table8_real_kg_results_tex",
+        "chapter9_per_repetition",
+        "chapter9_score_derivations",
+        "chapter9_validation_thresholds",
+        "encoding_suitability_metrics_csv",
+        "schema_phase_assignments",
+        "schema_matching_negative_control",
     ]
     return [
         str(output_files[key])
@@ -1959,6 +2815,11 @@ def collect_generated_data_files(output_files: dict[str, Any]) -> list[str]:
         "real_kg_raw_results",
         "environment",
         "run_summary",
+        "raw_counts_dir",
+        "encoding_suitability_metrics_md",
+        "chapter9_validation_md",
+        "chapter9_validation_json",
+        "schema_matching_raw",
     ]
     return [
         str(output_files[key])
@@ -2569,6 +3430,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     additional_validation_summary = summarize_usage_rows(additional_validation_rows)
     table3_rows = paper_encoding_table_rows(encoding_summary)
     table4_rows = paper_usage_table_rows(usage_summary)
+    table5_rows = validation_metric_table_rows(usage_rows)
     table6_rows = circuit_statistics_table_rows(usage_summary)
     synthetic_payload = (
         run_chapter9_synthetic_experiments(args, output_dir)
@@ -2584,11 +3446,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     table3_path = output_dir / "table3_encoding_process.csv"
     table4_path = output_dir / "table4_usage_tasks.csv"
+    table5_path = output_dir / "table5_validation_metrics.csv"
     table6_path = output_dir / "table6_circuit_statistics.csv"
     table7_path = output_dir / "table7_synthetic_results.csv"
     table8_path = output_dir / "table8_real_kg_results.csv"
     table3_tex_path = output_dir / "table3_encoding_process.tex"
     table4_tex_path = output_dir / "table4_usage_tasks.tex"
+    table5_tex_path = output_dir / "table5_validation_metrics.tex"
     table6_tex_path = output_dir / "table6_circuit_statistics.tex"
     table7_tex_path = output_dir / "table7_synthetic_results.tex"
     table8_tex_path = output_dir / "table8_real_kg_results.tex"
@@ -2601,6 +3465,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     if args.save_csv:
         write_csv(table3_rows, table3_path, ENCODING_TABLE_FIELDS)
         write_csv(table4_rows, table4_path, USAGE_TABLE_FIELDS)
+        write_csv(table5_rows, table5_path, VALIDATION_TABLE_FIELDS)
         write_csv(table6_rows, table6_path, TABLE6_CIRCUIT_FIELDS)
         if synthetic_payload:
             write_csv(table7_rows, table7_path, SYNTHETIC_TABLE_FIELDS)
@@ -2619,6 +3484,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             USAGE_LATEX_FIELDS,
             caption="Chapter 9 usage task benchmark on the six-triple running example.",
             label="tab:chapter9-usage-tasks",
+        )
+        write_latex_table(
+            table5_rows,
+            table5_tex_path,
+            VALIDATION_LATEX_FIELDS,
+            caption="Chapter 9 validation metrics for running-example tasks.",
+            label="tab:chapter9-validation-metrics",
         )
         write_latex_table(
             table6_rows,
@@ -2658,6 +3530,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         figures_dir=output_dir / "figures",
         index_mode=args.index_mode,
     )
+    validation_artifact_paths, validation_figures = write_validation_artifacts(
+        output_dir=output_dir,
+        args=args,
+        encoding_rows=encoding_rows,
+        usage_rows=usage_rows,
+    )
+    figures.extend(validation_figures)
     if synthetic_payload:
         figures.extend(
             write_synthetic_observation_plots(
@@ -2681,6 +3560,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "additional_validation_internal": additional_validation_summary,
         "table3_encoding_process": table3_rows,
         "table4_usage_tasks": table4_rows,
+        "table5_validation_metrics": table5_rows,
         "table6_circuit_statistics": table6_rows,
         "synthetic_observations": synthetic_payload,
         "table7_synthetic_results": table7_rows,
@@ -2689,11 +3569,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "output_files": {
             "table3_encoding_process": table3_path,
             "table4_usage_tasks": table4_path,
+            "table5_validation_metrics": table5_path,
             "table6_circuit_statistics": table6_path,
             "table7_synthetic_results": table7_path if synthetic_payload else None,
             "table8_real_kg_results": table8_path if real_payload else None,
             "table3_encoding_process_tex": table3_tex_path,
             "table4_usage_tasks_tex": table4_tex_path,
+            "table5_validation_metrics_tex": table5_tex_path,
             "table6_circuit_statistics_tex": table6_tex_path,
             "table7_synthetic_results_tex": (
                 table7_tex_path if synthetic_payload else None
@@ -2705,6 +3587,37 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "environment": env_path,
             "run_summary": run_summary_path,
             "figures": figures,
+            "chapter9_per_repetition": validation_artifact_paths.get(
+                "per_repetition"
+            ),
+            "chapter9_score_derivations": validation_artifact_paths.get(
+                "score_derivations"
+            ),
+            "chapter9_validation_thresholds": validation_artifact_paths.get(
+                "validation_thresholds"
+            ),
+            "raw_counts_dir": validation_artifact_paths.get("raw_counts_dir"),
+            "encoding_suitability_metrics_csv": validation_artifact_paths.get(
+                "encoding_suitability_metrics_csv"
+            ),
+            "encoding_suitability_metrics_md": validation_artifact_paths.get(
+                "encoding_suitability_metrics_md"
+            ),
+            "chapter9_validation_md": validation_artifact_paths.get(
+                "chapter9_validation_md"
+            ),
+            "chapter9_validation_json": validation_artifact_paths.get(
+                "chapter9_validation_json"
+            ),
+            "schema_phase_assignments": validation_artifact_paths.get(
+                "schema_phase_assignments"
+            ),
+            "schema_matching_raw": validation_artifact_paths.get(
+                "schema_matching_raw"
+            ),
+            "schema_matching_negative_control": validation_artifact_paths.get(
+                "schema_matching_negative_control"
+            ),
         },
     }
     environment = environment_payload(
@@ -2748,6 +3661,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     if args.save_csv:
         print(f"  Table 3 CSV: {table3_path}")
         print(f"  Table 4 CSV: {table4_path}")
+        print(f"  Table 5 CSV: {table5_path}")
         print(f"  Table 6 CSV: {table6_path}")
         if synthetic_payload:
             print(f"  Table 7 CSV: {table7_path}")
@@ -2755,6 +3669,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             print(f"  Table 8 CSV: {table8_path}")
         print(f"  Table 3 LaTeX: {table3_tex_path}")
         print(f"  Table 4 LaTeX: {table4_tex_path}")
+        print(f"  Table 5 LaTeX: {table5_tex_path}")
         print(f"  Table 6 LaTeX: {table6_tex_path}")
         if synthetic_payload:
             print(f"  Table 7 LaTeX: {table7_tex_path}")

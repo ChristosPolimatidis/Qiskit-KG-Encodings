@@ -1,0 +1,21 @@
+﻿{
+    "status":  "FAILED",
+    "message":  "",
+    "profile":  "light",
+    "run_dir":  "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\results\\runs\\20260706_203219_light",
+    "results_root":  "C:\\Users\\User\\Documents\\GitHub\\Quskit-KG-Ecodings\\results\\runs",
+    "seed":  12345,
+    "shots":  1024,
+    "repetitions":  1,
+    "synthetic_sizes":  [
+                            "100"
+                        ],
+    "real_files":  [
+
+                   ],
+    "append":  false,
+    "skip_install":  false,
+    "started_at":  "2026-07-06T20:32:19.7065382+03:00",
+    "updated_at":  "2026-07-06T20:33:48.4513334+03:00",
+    "finished_at":  "2026-07-06T20:33:48.4518312+03:00"
+}

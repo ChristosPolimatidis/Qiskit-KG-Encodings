@@ -133,6 +133,9 @@ RAW_FIELDNAMES = [
     "compute_decomposed_metrics",
     "compute_transpiled_metrics",
     "rdf_format",
+    "original_num_triples",
+    "max_real_triples",
+    "truncation_applied",
 ]
 
 SUMMARY_FIELDNAMES = [
@@ -331,6 +334,7 @@ def apply_runtime_settings(
                 None,
             ),
             "rdf_format": getattr(args, "rdf_format", None),
+            "max_real_triples": getattr(args, "max_real_triples", None),
         }
     )
 
@@ -765,6 +769,26 @@ def run_one_configuration(
             row["error_message"] = f"{type(exc).__name__}: {exc}"
             return row
 
+        original_num_triples = len(triples)
+        max_real_triples = getattr(args, "max_real_triples", None)
+        row["original_num_triples"] = original_num_triples
+        row["max_real_triples"] = max_real_triples
+        row["truncation_applied"] = False
+        if (
+            dataset_category == "real"
+            and max_real_triples is not None
+            and original_num_triples > max_real_triples
+        ):
+            triples = sorted(
+                triples,
+                key=lambda triple: (
+                    triple.subject,
+                    triple.predicate,
+                    triple.object,
+                ),
+            )[:max_real_triples]
+            row["truncation_applied"] = True
+
         context, mapping_elapsed = timed_call(
             build_encoding_context,
             triples=triples,
@@ -1043,6 +1067,7 @@ def raw_row_key(row: dict[str, Any]) -> tuple[str, ...]:
         keyed_setting(row, "compute_transpiled_metrics", "True"),
         key_value(row.get("rdf_format")),
         key_value(row.get("timeout_seconds")),
+        key_value(row.get("max_real_triples")),
     )
 
 
@@ -1074,6 +1099,7 @@ def configuration_key(
         key_value(getattr(args, "compute_transpiled_metrics", "")),
         key_value(getattr(args, "rdf_format", "")),
         key_value(getattr(args, "timeout_seconds", "")),
+        key_value(getattr(args, "max_real_triples", "")),
     )
 
 
@@ -1800,6 +1826,7 @@ def build_runtime_args(args: argparse.Namespace) -> argparse.Namespace:
         compute_decomposed_metrics=args.compute_decomposed_metrics,
         compute_transpiled_metrics=args.compute_transpiled_metrics,
         timeout_seconds=getattr(args, "timeout_seconds", None),
+        max_real_triples=getattr(args, "max_real_triples", None),
     )
 
 
@@ -1850,6 +1877,15 @@ def build_argument_parser() -> argparse.ArgumentParser:
         type=float,
         default=None,
         help="Optional per-run timeout. Timed-out runs are recorded and the batch continues.",
+    )
+    parser.add_argument(
+        "--max-real-triples",
+        type=int,
+        default=None,
+        help=(
+            "Deterministically truncate real KG files to this many triples after "
+            "parsing. Synthetic datasets are unaffected."
+        ),
     )
     parser.add_argument(
         "--append",

@@ -32,6 +32,8 @@ C:\Users\User\AppData\Local\Programs\Python\Python313\python.exe scripts/run_cha
 - results\chapter9\table3_encoding_process.tex
 - results\chapter9\table4_usage_tasks.csv
 - results\chapter9\table4_usage_tasks.tex
+- results\chapter9\table5_validation_metrics.csv
+- results\chapter9\table5_validation_metrics.tex
 - results\chapter9\table6_circuit_statistics.csv
 - results\chapter9\table6_circuit_statistics.tex
 - results\chapter9\table7_synthetic_results.csv
@@ -94,7 +96,7 @@ C:\Users\User\AppData\Local\Programs\Python\Python313\python.exe scripts/run_cha
 
 ## Environment
 
-- Timestamp UTC: `2026-05-23T21:12:27+00:00`
+- Timestamp UTC: `2026-05-24T17:18:17+00:00`
 - Hostname: `DESKTOP-8ICK71U`
 - Python: `3.13.5`
 - Qiskit: `2.4.1`
@@ -104,5 +106,5 @@ C:\Users\User\AppData\Local\Programs\Python\Python313\python.exe scripts/run_cha
 - OS: `Windows-11-10.0.26200-SP0`
 - CPU: `Intel64 Family 6 Model 151 Stepping 5, GenuineIntel`
 - RAM: `39.75 GiB`
-- Git commit: `bdd5c6ba16bf4450bafb18797a11d0e6c16163a1`
+- Git commit: `1c13883bcad62493055457e9dd56058d5510ab71`
 - Random seed: `12345`

@@ -73,11 +73,13 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertIn("old scalability experiments were not run", completed.stdout)
             self.assertTrue((output_dir / "table3_encoding_process.csv").exists())
             self.assertTrue((output_dir / "table4_usage_tasks.csv").exists())
+            self.assertTrue((output_dir / "table5_validation_metrics.csv").exists())
             self.assertTrue((output_dir / "table6_circuit_statistics.csv").exists())
             self.assertFalse((output_dir / "table7_synthetic_results.csv").exists())
             self.assertFalse((output_dir / "table8_real_kg_results.csv").exists())
             self.assertTrue((output_dir / "table3_encoding_process.tex").exists())
             self.assertTrue((output_dir / "table4_usage_tasks.tex").exists())
+            self.assertTrue((output_dir / "table5_validation_metrics.tex").exists())
             self.assertTrue((output_dir / "table6_circuit_statistics.tex").exists())
             self.assertFalse((output_dir / "table7_synthetic_results.tex").exists())
             self.assertFalse((output_dir / "table8_real_kg_results.tex").exists())
@@ -86,6 +88,16 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertFalse((output_dir / "real_kg_raw_results.json").exists())
             self.assertTrue((output_dir / "environment.json").exists())
             self.assertTrue((output_dir / "RUN_SUMMARY.md").exists())
+            self.assertTrue((output_dir / "chapter9_per_repetition.csv").exists())
+            self.assertTrue((output_dir / "chapter9_score_derivations.csv").exists())
+            self.assertTrue((output_dir / "chapter9_validation_thresholds.csv").exists())
+            self.assertTrue((output_dir / "reports" / "chapter9_validation.md").exists())
+            self.assertTrue((output_dir / "reports" / "chapter9_validation.json").exists())
+            self.assertTrue((output_dir / "reports" / "encoding_suitability_metrics.csv").exists())
+            self.assertTrue((output_dir / "reports" / "encoding_suitability_metrics.md").exists())
+            self.assertTrue((output_dir / "schema_matching" / "schema_phase_assignments.csv").exists())
+            self.assertTrue((output_dir / "schema_matching" / "schema_matching_raw.json").exists())
+            self.assertTrue((output_dir / "schema_matching" / "schema_matching_negative_control.csv").exists())
             if importlib.util.find_spec("matplotlib") is not None:
                 for figure_name in (
                     "table3_encoding_time_bar.png",
@@ -93,6 +105,12 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                     "table4_task_time_bar.png",
                     "amplitude_probabilities.png",
                     "combined_magnitude_phase.png",
+                    "hist_basis_lookup.png",
+                    "hist_entity_matching_swap_test.png",
+                    "hist_link_prediction_distance.png",
+                    "hist_multihop_phase.png",
+                    "hist_schema_qft_pattern_a.png",
+                    "hist_schema_qft_pattern_b.png",
                 ):
                     self.assertTrue((output_dir / "figures" / figure_name).exists())
 
@@ -110,6 +128,9 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 encoding="utf-8"
             )
             table6_lines = table6_text.splitlines()
+            table5_text = (output_dir / "table5_validation_metrics.csv").read_text(
+                encoding="utf-8"
+            )
             table4_csv = (output_dir / "table4_usage_tasks.csv").read_text(
                 encoding="utf-8"
             )
@@ -129,23 +150,36 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 table6_lines[0],
                 (
                     "Task,Encoding,Method,Qubits,Circuit Depth,Gate Count,"
-                    "Transpiled Depth,Transpiled Gate Count,Shots,Repetitions"
+                    "Transpiled Depth,Transpiled Gate Count,Shots,Repetitions,"
+                    "Measurement Mode,Grover Iterations,Claim Scope"
                 ),
             )
             for expected_row in (
                 "Search,Basis,Grover",
                 "Entity Matching,Amplitude,Swap Test",
+                "Keyword Search,Amplitude,Swap Test",
                 "Link Prediction,Amplitude,Distance Estimation",
                 "Multi-hop Reasoning,Phase,Phase Kickback",
                 "Schema Matching,Phase,QFT",
             ):
                 self.assertIn(expected_row, table6_text)
-            self.assertIn(",0,1", table6_text)
+            self.assertEqual(
+                table5_text.splitlines()[0],
+                "KG Task,Validation Metric,Value,Notes",
+            )
+            self.assertIn("Keyword Search,top_score", table5_text)
+            self.assertIn("top result = Aristotle", table5_text)
+            self.assertIn("shot-based X/Y Hadamard-test", table6_text)
+            self.assertIn("shot-based QFT register measurements", table6_text)
+            self.assertIn(",64,1,shot-based X/Y", table6_text)
             self.assertIn("--", table6_text)
             table3_tex = (output_dir / "table3_encoding_process.tex").read_text(
                 encoding="utf-8"
             )
             table4_tex = (output_dir / "table4_usage_tasks.tex").read_text(
+                encoding="utf-8"
+            )
+            table5_tex = (output_dir / "table5_validation_metrics.tex").read_text(
                 encoding="utf-8"
             )
             table6_tex = (output_dir / "table6_circuit_statistics.tex").read_text(
@@ -169,11 +203,18 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
                 "KG Task & Encoding & Quantum Method & Main Result & Time",
                 table4_tex,
             )
+            self.assertIn(
+                "KG Task & Validation Metric & Value & Notes",
+                table5_tex,
+            )
+            self.assertIn("Keyword Search", table5_tex)
+            self.assertIn("top result = Aristotle", table5_tex)
             self.assertIn("sequential-only validation task", table4_csv)
             self.assertIn("sequential-only validation task", table4_tex)
             for expected_row in (
                 "Search,Basis,Grover lookup",
                 "Entity Matching,Amplitude,Swap Test",
+                "Keyword Search,Amplitude,Swap Test",
                 "Link Prediction,Amplitude,Distance Estimation",
                 "Multi-hop Reasoning,Phase,Phase Kickback",
                 "Schema Matching,Phase,QFT",
@@ -186,7 +227,8 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertIn(
                 (
                     "Task & Encoding & Method & Qubits & Circuit Depth & Gate Count "
-                    "& Transpiled Depth & Transpiled Gate Count & Shots & Repetitions"
+                    "& Transpiled Depth & Transpiled Gate Count & Shots & Repetitions "
+                    "& Measurement Mode & Grover Iterations & Claim Scope"
                 ),
                 table6_tex,
             )
@@ -196,9 +238,35 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             )
             self.assertEqual(payload["running_example_triple_count"], 6)
             self.assertEqual(len(payload["encoding_process_rows"]), 6)
-            self.assertEqual(len(payload["usage_task_rows"]), 5)
+            self.assertEqual(len(payload["usage_task_rows"]), 6)
             self.assertEqual(len(payload["additional_validation_rows"]), 1)
-            self.assertEqual(len(payload["table6_circuit_statistics"]), 5)
+            self.assertEqual(len(payload["table5_validation_metrics"]), 6)
+            self.assertEqual(len(payload["table6_circuit_statistics"]), 6)
+            self.assertIn("chapter9_score_derivations", payload["output_files"])
+            self.assertIn("chapter9_validation_thresholds", payload["output_files"])
+            self.assertIn("schema_phase_assignments", payload["output_files"])
+            keyword_rows = [
+                row
+                for row in payload["usage_task_rows"]
+                if row["task"] == "keyword_search_swap_test"
+            ]
+            self.assertEqual(len(keyword_rows), 1)
+            self.assertEqual(keyword_rows[0]["result"]["top_result"], "Aristotle")
+            self.assertIn("estimated_scores", keyword_rows[0]["result"])
+            multihop_rows = [
+                row
+                for row in payload["usage_task_rows"]
+                if row["task"] == "multihop_phase_kickback"
+            ]
+            self.assertEqual(multihop_rows[0]["shots"], 64)
+            self.assertEqual(multihop_rows[0]["result"]["shots"], 64)
+            schema_rows = [
+                row
+                for row in payload["usage_task_rows"]
+                if row["task"] == "schema_matching_qft"
+            ]
+            self.assertEqual(schema_rows[0]["shots"], 64)
+            self.assertIn("negative_control", schema_rows[0]["result"])
             self.assertEqual(payload["table7_synthetic_results"], [])
             self.assertEqual(payload["table8_real_kg_results"], [])
             self.assertIsNone(payload["output_files"]["table7_synthetic_results"])
@@ -243,9 +311,13 @@ class RunChapter9ExperimentsScriptTests(unittest.TestCase):
             self.assertEqual(environment["command_line_arguments"]["shots"], 64)
             self.assertIn("logical_cpus", environment["cpu"])
             self.assertIn("table3_encoding_process.csv", str(environment["generated_tables"]))
+            self.assertIn("table5_validation_metrics.csv", str(environment["generated_tables"]))
             self.assertIn("table6_circuit_statistics.csv", str(environment["generated_tables"]))
+            self.assertIn("chapter9_score_derivations.csv", str(environment["generated_tables"]))
             self.assertIn("amplitude_probabilities.png", str(environment["generated_plots"]))
+            self.assertIn("hist_multihop_phase.png", str(environment["generated_plots"]))
             self.assertIn("chapter9_raw_results.json", str(environment["generated_data_files"]))
+            self.assertIn("chapter9_validation.md", str(environment["generated_data_files"]))
             self.assertIn("RUN_SUMMARY.md", str(environment["generated_data_files"]))
             self.assertEqual(environment["synthetic_sizes_used"], [])
             self.assertEqual(environment["real_kg_files_used"], [])

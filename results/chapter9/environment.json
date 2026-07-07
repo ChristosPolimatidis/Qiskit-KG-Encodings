@@ -1,6 +1,6 @@
 {
-  "timestamp_utc": "2026-05-23T21:12:27+00:00",
-  "created_at_utc": "2026-05-23T21:12:27+00:00",
+  "timestamp_utc": "2026-05-24T17:18:17+00:00",
+  "created_at_utc": "2026-05-24T17:18:17+00:00",
   "python_version": "3.13.5",
   "python": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
   "operating_system": {
@@ -109,12 +109,14 @@
     "max_real_triples": 500
   },
   "random_seed": 12345,
-  "git_commit_hash": "bdd5c6ba16bf4450bafb18797a11d0e6c16163a1",
+  "git_commit_hash": "1c13883bcad62493055457e9dd56058d5510ab71",
   "generated_tables": [
     "results\\chapter9\\table3_encoding_process.csv",
     "results\\chapter9\\table3_encoding_process.tex",
     "results\\chapter9\\table4_usage_tasks.csv",
     "results\\chapter9\\table4_usage_tasks.tex",
+    "results\\chapter9\\table5_validation_metrics.csv",
+    "results\\chapter9\\table5_validation_metrics.tex",
     "results\\chapter9\\table6_circuit_statistics.csv",
     "results\\chapter9\\table6_circuit_statistics.tex",
     "results\\chapter9\\table7_synthetic_results.csv",

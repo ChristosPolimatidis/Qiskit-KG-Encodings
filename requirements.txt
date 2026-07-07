@@ -3,3 +3,4 @@ qiskit-aer
 rdflib
 numpy
 matplotlib
+pytest

@@ -20,6 +20,7 @@ DEFAULT_ENTITY_A = f"{EX}Aristotle"
 DEFAULT_ENTITY_B = f"{EX}Athens"
 DEFAULT_SHOTS = 4096
 DEFAULT_SEED_SIMULATOR = 24680
+DEFAULT_SWAP_TEST_TOLERANCE = 0.05
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,8 +36,19 @@ class AmplitudeSimilarityResult:
     normalized_vector_a: list[float]
     normalized_vector_b: list[float]
     counts: dict[str, int]
+    probabilities: dict[str, float]
     task_time_seconds: float
+    normalization_time_seconds: float
+    state_preparation_time_seconds: float
+    simulation_time_seconds: float
+    measurement_time_seconds: float
+    readout_decoding_time_seconds: float
     num_qubits: int
+    vector_dimension: int
+    nonzero_entries_a: int
+    nonzero_entries_b: int
+    dense_memory_bytes: int
+    sparse_memory_bytes: int
     circuit_depth: int
     gate_count: int
     transpiled_depth: int
@@ -46,6 +58,12 @@ class AmplitudeSimilarityResult:
     estimated_similarity: float
     classical_similarity: float
     absolute_error: float
+    relative_error: float | None
+    pass_threshold: float
+    pass_fail: str
+    threshold_reason: str
+    measurement_mode: str
+    claim_scope: str
     backend: str
     claim_note: str
 
@@ -134,6 +152,17 @@ def classical_squared_similarity(
     return float(abs(overlap) ** 2)
 
 
+def amplitude_memory_estimates(*vectors: np.ndarray) -> tuple[int, int]:
+    """Return dense and sparse byte estimates for small complex vectors."""
+
+    dense_bytes = sum(int(vector.size) * np.dtype(np.complex128).itemsize for vector in vectors)
+    sparse_entries = sum(int(np.count_nonzero(vector)) for vector in vectors)
+    index_bytes = np.dtype(np.int64).itemsize
+    value_bytes = np.dtype(np.complex128).itemsize
+    sparse_bytes = sparse_entries * (index_bytes + value_bytes)
+    return dense_bytes, sparse_bytes
+
+
 def run_amplitude_similarity_task(
     *,
     entity_a: str = DEFAULT_ENTITY_A,
@@ -147,22 +176,47 @@ def run_amplitude_similarity_task(
     feature_labels = _predicate_feature_labels()
     vector_a = entity_context_vector(entity_a, feature_labels=feature_labels)
     vector_b = entity_context_vector(entity_b, feature_labels=feature_labels)
+    normalization_start = time.perf_counter()
     normalized_a = normalize_and_pad(vector_a)
     normalized_b = normalize_and_pad(vector_b)
+    normalization_time = time.perf_counter() - normalization_start
 
+    preparation_start = time.perf_counter()
     circuit = build_swap_test_circuit(
         normalized_vector_a=normalized_a,
         normalized_vector_b=normalized_b,
     )
+    state_preparation_time = time.perf_counter() - preparation_start
     simulator = AerSimulator(seed_simulator=seed_simulator)
+    simulation_start = time.perf_counter()
     transpiled_circuit = transpile(circuit, simulator, optimization_level=0)
+    simulation_time = time.perf_counter() - simulation_start
+    measurement_start = time.perf_counter()
     result = simulator.run(transpiled_circuit, shots=shots).result()
+    measurement_time = time.perf_counter() - measurement_start
+    readout_start = time.perf_counter()
     counts = dict(sorted(result.get_counts().items()))
+    probabilities = {
+        bitstring: count / shots
+        for bitstring, count in counts.items()
+    }
 
     p0 = counts.get("0", 0) / shots
     estimated_similarity = min(1.0, max(0.0, (2 * p0) - 1))
     classical_similarity = classical_squared_similarity(normalized_a, normalized_b)
     absolute_error = abs(estimated_similarity - classical_similarity)
+    relative_error = (
+        absolute_error / abs(classical_similarity)
+        if not np.isclose(classical_similarity, 0.0)
+        else None
+    )
+    readout_decoding_time = time.perf_counter() - readout_start
+    tolerance = DEFAULT_SWAP_TEST_TOLERANCE if shots >= 1000 else 0.25
+    pass_fail = "pass" if absolute_error <= tolerance else "fail"
+    dense_memory_bytes, sparse_memory_bytes = amplitude_memory_estimates(
+        normalized_a,
+        normalized_b,
+    )
     task_time_seconds = time.perf_counter() - task_start
 
     return AmplitudeSimilarityResult(
@@ -175,8 +229,19 @@ def run_amplitude_similarity_task(
         normalized_vector_a=[float(value.real) for value in normalized_a],
         normalized_vector_b=[float(value.real) for value in normalized_b],
         counts=counts,
+        probabilities=probabilities,
         task_time_seconds=task_time_seconds,
+        normalization_time_seconds=normalization_time,
+        state_preparation_time_seconds=state_preparation_time,
+        simulation_time_seconds=simulation_time,
+        measurement_time_seconds=measurement_time,
+        readout_decoding_time_seconds=readout_decoding_time,
         num_qubits=circuit.num_qubits,
+        vector_dimension=int(normalized_a.size),
+        nonzero_entries_a=int(np.count_nonzero(normalized_a)),
+        nonzero_entries_b=int(np.count_nonzero(normalized_b)),
+        dense_memory_bytes=dense_memory_bytes,
+        sparse_memory_bytes=sparse_memory_bytes,
         circuit_depth=circuit.depth(),
         gate_count=_operation_count(circuit),
         transpiled_depth=transpiled_circuit.depth(),
@@ -186,6 +251,15 @@ def run_amplitude_similarity_task(
         estimated_similarity=estimated_similarity,
         classical_similarity=classical_similarity,
         absolute_error=absolute_error,
+        relative_error=relative_error,
+        pass_threshold=tolerance,
+        pass_fail=pass_fail,
+        threshold_reason=(
+            "Swap-test squared-similarity estimate must be within the configured "
+            "absolute-error tolerance of the exact NumPy dot product."
+        ),
+        measurement_mode="shot-based swap-test ancilla readout",
+        claim_scope="implementation-level validation; no quantum-advantage claim",
         backend="AerSimulator",
         claim_note=(
             "This is a small validation task for amplitude encoding and swap-test "

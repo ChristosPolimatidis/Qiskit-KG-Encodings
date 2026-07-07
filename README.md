@@ -28,6 +28,7 @@ synthetic KGs are used for controlled scalability experiments.
 - [Synthetic KG Datasets](#synthetic-kg-datasets)
 - [Real KG Datasets](#real-kg-datasets)
 - [Running Experiments](#running-experiments)
+- [Windows Profile Runner](#windows-profile-runner)
 - [Chapter 9 Experiments](#chapter-9-experiments)
   - [Chapter 9 Sections 9.2 and 9.3](#chapter-9-sections-92-and-93)
 - [Incremental Experiments](#incremental-experiments)
@@ -99,6 +100,9 @@ scaling and thesis experiment scripts live in [scripts/](scripts/).
 |       `-- combined/
 |-- scripts/
 |   |-- generate_scaling_datasets.py
+|   |-- build_validation_report.py
+|   |-- run_classical_baselines.py
+|   |-- run_experiments_windows.ps1
 |   |-- run_scaling_experiments.py
 |   |-- run_all_experiments.py
 |   `-- sample_dbpedia.py
@@ -169,6 +173,7 @@ The current requirements are:
 - `rdflib`
 - `numpy`
 - `matplotlib`
+- `pytest`
 
 If Qiskit or Aer is missing in your environment, install them explicitly:
 
@@ -400,12 +405,54 @@ results/scaling/combined/
 python scripts/run_all_experiments.py --synthetic-sizes 100 1000 5000 --repetitions 5 --shots 1024 --timeout-seconds 600
 ```
 
+## Windows Profile Runner
+
+For one reproducible run folder containing tests, Chapter 9 validation,
+scaling outputs, classical sanity baselines, command logs, environment files,
+and a top-level validation report, use the PowerShell runner:
+
+```powershell
+.\scripts\run_experiments_windows.ps1 -Profile light
+.\scripts\run_experiments_windows.ps1 -Profile medium -ResultsRoot results\runs
+.\scripts\run_experiments_windows.ps1 -Profile hard -ResultsRoot D:\kg_encoding_runs -Append
+```
+
+Profiles are normal experiment profiles only: `light`, `medium`, and `hard`.
+The runner creates exactly one timestamped run directory under `-ResultsRoot`,
+for example:
+
+```text
+results\runs\20260706_193000_medium\
+```
+
+Important files in that folder include:
+
+| Path | Purpose |
+| --- | --- |
+| `run_manifest.json` | Run status, profile, seed, shot count, and profile settings. |
+| `command_log.jsonl` | One start/finish record per command, with log path and exit code. |
+| `logs/` | Tee'd console logs for pytest, Chapter 9, scaling, baselines, and report building. |
+| `tests/pytest.xml` | Test report from `python -m pytest`. |
+| `chapter9_sequential/` and `chapter9_paper/` | Chapter 9 outputs for the selected profile index modes. |
+| `scaling/` | Synthetic, real, and combined scaling outputs under the run folder. |
+| `baselines/` | Classical sanity baseline CSV and JSON files. |
+| `reports/validation_summary.md` | Top-level artifact and threshold summary for the run. |
+| `reports/artifact_index.csv` | Index of generated CSV, JSON, Markdown, TeX, XML, and figure files. |
+| `result_tree.txt` | Folder tree produced at the end of the run. |
+
+Use `-SkipInstall` only when your current Python environment already has the
+dependencies installed. Without `-SkipInstall`, the runner creates or reuses
+`.venv` and installs `requirements.txt`.
+
+These outputs are implementation-level evidence and sanity checks. They do not
+claim quantum advantage.
+
 ## Chapter 9 Experiments
 
 The Chapter 9 experiment runner is separate from the older scalability
 experiments. It focuses only on the canonical six-triple running example used in
 the new thesis paper, and it writes paper-facing summary tables for the four
-encoding families and the five small validation tasks.
+encoding families and the six small validation tasks.
 
 This script does **not** run the old large synthetic/real scalability
 experiments. To run those, use `scripts/run_scaling_experiments.py` or
@@ -485,10 +532,15 @@ For an output directory such as `results/chapter9`, the script writes:
 | --- | --- |
 | `results/chapter9/table3_encoding_process.csv` | Paper-facing Table 3 data for encoding creation: encoding, variant, index mode, qubits, dimension, creation time, circuit metrics, and notes. |
 | `results/chapter9/table3_encoding_process.tex` | Compact LaTeX version of Table 3. |
-| `results/chapter9/table4_usage_tasks.csv` | Paper-facing Table 4 data for the Table 1 task-to-encoding mapping: Search/Grover lookup, Entity Matching/Swap Test, Link Prediction/Distance Estimation, Multi-hop Reasoning/Phase Kickback, and Schema Matching/QFT. |
+| `results/chapter9/table4_usage_tasks.csv` | Paper-facing Table 4 data for the Table 1 task-to-encoding mapping: Search/Grover lookup, Entity Matching/Swap Test, Keyword Search/Swap Test, Link Prediction/Distance Estimation, Multi-hop Reasoning/Phase Kickback, and Schema Matching/QFT. |
 | `results/chapter9/table4_usage_tasks.tex` | Compact LaTeX version of Table 4. |
-| `results/chapter9/table6_circuit_statistics.csv` | Circuit statistics for the five Chapter 9 running-example task validations: qubits, depth, gate counts, transpiled metrics, shots, and repetitions. |
+| `results/chapter9/table5_validation_metrics.csv` | Compact validation metrics for the running-example tasks, including Keyword Search top score and top result. |
+| `results/chapter9/table5_validation_metrics.tex` | Compact LaTeX version of Table 5. |
+| `results/chapter9/table6_circuit_statistics.csv` | Circuit statistics for the six Chapter 9 running-example task validations: qubits, depth, gate counts, transpiled metrics, shots, repetitions, measurement mode, Grover iterations where applicable, and claim scope. |
 | `results/chapter9/table6_circuit_statistics.tex` | Compact LaTeX version of Table 6. |
+| `results/chapter9/chapter9_per_repetition.csv` | Per-repetition audit rows for encoding-process and usage-task measurements. |
+| `results/chapter9/chapter9_score_derivations.csv` | Explicit score derivations from counts or exact/classical references. |
+| `results/chapter9/chapter9_validation_thresholds.csv` | Expected values, estimates, errors, thresholds, pass/fail status, and threshold reasons. |
 | `results/chapter9/table7_synthetic_results.csv` | Optional Section 9.2 synthetic KG software-level observations when `--include-synthetic` is passed. |
 | `results/chapter9/table7_synthetic_results.tex` | Compact LaTeX version of Table 7 with triples, encoding, qubits, encoding time, depth, simulation time, and status. |
 | `results/chapter9/synthetic_raw_results.json` | Optional raw synthetic observation payload with detailed rows and reused scalability-runner rows. |
@@ -496,9 +548,14 @@ For an output directory such as `results/chapter9`, the script writes:
 | `results/chapter9/table8_real_kg_results.tex` | Compact LaTeX version of Table 8 with dataset, triples, entities, predicates, encoding, qubits, encoding time, and status. |
 | `results/chapter9/real_kg_raw_results.json` | Optional raw real KG observation payload with detailed rows and reused parser/encoding helper rows. |
 | `results/chapter9/chapter9_raw_results.json` | Full raw run metadata, detailed rows, task payloads, and the additional combined amplitude-phase validation kept separate from Table 4. Use this as the audit trail, not as a table pasted into the paper. |
+| `results/chapter9/raw_counts/` | Raw measurement counts and normalized probability CSV/JSON artifacts for shot-based tasks. |
+| `results/chapter9/schema_matching/` | Schema phase assignments, raw schema-QFT payloads, and negative-control rows. |
+| `results/chapter9/reports/chapter9_validation.md` | Human-readable validation summary for Chapter 9 task evidence. |
+| `results/chapter9/reports/encoding_suitability_metrics.csv` | Relative implementation-level metrics by task and encoding. |
+| `results/chapter9/reports/encoding_suitability_metrics.md` | Markdown version of the suitability metrics. |
 | `results/chapter9/environment.json` | Reproducibility metadata: Python, OS, CPU/RAM when available, package versions, command-line arguments, timestamp, seed, hostname, and git commit hash when available. |
 | `results/chapter9/RUN_SUMMARY.md` | Human-readable reproducibility summary with the exact command, generated tables and plots, optional synthetic sizes, optional real KG files, skipped/failed rows and reasons, environment metadata, and the simulator/no-quantum-advantage note. |
-| `results/chapter9/figures/` | Optional runtime and paper-facing plots, including Table 3 time/qubits, Table 4 task time, amplitude probabilities, and combined magnitude/phase. |
+| `results/chapter9/figures/` | Optional runtime, probability, and measurement plots, including Table 3 time/qubits, Table 4 task time, amplitude probabilities, combined magnitude/phase, and shot-count histograms. |
 | `results/chapter9/figures/synthetic_*.png` | Optional Section 9.2 line plots for synthetic encoding time, qubits, circuit depth, and total time when `--include-synthetic` is passed. |
 
 At the end of a run, the script prints a short summary including the machine
@@ -539,7 +596,7 @@ The append deduplication key uses:
 ```text
 dataset_name + dataset_category + encoding + repetition + shots
 + simulator limits + metric limits + timeout + weight strategy
-+ phase settings + rdf format
++ phase settings + rdf format + max real triples
 ```
 
 ### Regenerate Plots Only
@@ -594,6 +651,7 @@ This script runs **synthetic-only** scaling experiments.
 | `--repetitions` | `5` | Number of repetitions per size/encoding. | Use more for stable averages; use 1 for smoke tests. | `--repetitions 1` |
 | `--shots` | `2048` | Measurement shots used for sampled counts. | Lower for speed, higher for smoother measurement estimates. | `--shots 1024` |
 | `--timeout-seconds` | none | Optional per-run timeout. Timed-out rows are recorded. | Use for large or risky runs. | `--timeout-seconds 600` |
+| `--max-real-triples` | none | Deterministically truncate real KG files after parsing. Synthetic-only runs are unaffected. | Use through the shared scaling machinery for guarded real runs. | `--max-real-triples 500` |
 | `--append` | off | Append new configurations to the existing raw CSV and rebuild summary/plots. | Use for incremental experiments. | `--append` |
 | `--regenerate-plots-only` | off | Do not run experiments; rebuild summary and plots from raw CSV. | Use after editing plotting code or combining rows. | `--regenerate-plots-only` |
 | `--rdf-format` | none | Force an RDFLib parser format. | Rare for synthetic data. | `--rdf-format turtle` |
@@ -630,6 +688,7 @@ This script runs synthetic, real, and combined workflows.
 | `--repetitions` | `5` | Repetitions per dataset/encoding. | Use 1 for smoke tests. | `--repetitions 1` |
 | `--shots` | `1024` | Measurement shots. | Tune speed versus measurement stability. | `--shots 256` |
 | `--timeout-seconds` | `600` | Per-run timeout. | Use to prevent large runs from hanging. | `--timeout-seconds 120` |
+| `--max-real-triples` | none | Deterministically truncate each real KG file after parsing. Synthetic datasets are unaffected. | Use for medium/hard guarded real-KG runs. | `--max-real-triples 500` |
 | `--append` | off | Append to existing synthetic/real CSVs and rebuild combined outputs. | Use for incremental all-in-one runs. | `--append` |
 | `--regenerate-plots-only` | off | Rebuild summaries and plots from stored raw CSVs. | Use after appending or changing plots. | `--regenerate-plots-only` |
 | `--skip-synthetic` | off | Skip synthetic runs/regeneration. Existing synthetic rows can still be used in combined output. | Use for real-only runs. | `--skip-synthetic` |
@@ -648,6 +707,39 @@ This script runs synthetic, real, and combined workflows.
 | `--compute-transpiled-metrics` | on | Compute guarded transpiled depth/count metrics with Qiskit `transpile`. | Use default for small/medium runs. | `--compute-transpiled-metrics` |
 | `--no-compute-transpiled-metrics` | off | Skip transpiled metric extraction. | Use when transpilation becomes the bottleneck. | `--no-compute-transpiled-metrics` |
 | `--no-generate-missing` | off | Do not generate missing synthetic files. | Use when data should already exist. | `--no-generate-missing` |
+
+### `scripts/run_experiments_windows.ps1`
+
+PowerShell orchestrator for one timestamped run folder.
+
+| Parameter | Default | What It Does | Example |
+| --- | --- | --- | --- |
+| `-Profile` | `light` | Selects `light`, `medium`, or `hard` workload settings. | `-Profile medium` |
+| `-ResultsRoot` | `results\runs` | Root folder where the timestamped run directory is created. | `-ResultsRoot D:\kg_encoding_runs` |
+| `-Seed` | `12345` | Seed passed to deterministic Python runs. | `-Seed 12345` |
+| `-Append` | off | Passes append/resume behavior to long-running scaling commands. | `-Append` |
+| `-SkipInstall` | off | Use the current Python environment instead of creating/installing `.venv`. | `-SkipInstall` |
+| `-Clean` | off | Remove a colliding run directory under `-ResultsRoot` before starting. | `-Clean` |
+| `-OpenOutput` | off | Opens the run folder at the end of a successful run. | `-OpenOutput` |
+| `-Python` | `py -3` | Python launcher command used before a `.venv` is selected. | `-Python python` |
+
+### `scripts/run_classical_baselines.py`
+
+Writes deterministic toy classical sanity baselines to an output directory.
+
+| Parameter | Default | What It Does | Example |
+| --- | --- | --- | --- |
+| `--output-dir` | `results/baselines` | Folder for raw CSV, summary CSV, and JSON baseline outputs. | `--output-dir results\runs\run1\baselines` |
+| `--seed` | `12345` | Recorded for reproducibility. | `--seed 12345` |
+
+### `scripts/build_validation_report.py`
+
+Indexes a run directory and writes `reports/validation_summary.md`,
+`reports/validation_summary.json`, and `reports/artifact_index.csv`.
+
+| Parameter | Default | What It Does | Example |
+| --- | --- | --- | --- |
+| `--run-dir` | required | Run directory to inspect. | `--run-dir results\runs\20260706_193000_medium` |
 
 ### `scripts/sample_dbpedia.py`
 

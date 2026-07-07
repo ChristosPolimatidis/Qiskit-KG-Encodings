@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.08}
+\caption{Chapter 9 validation metrics for running-example tasks.}
+\label{tab:chapter9-validation-metrics}
+\begin{tabular}{@{}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}p{0.085\linewidth}@{}}
+\hline
+KG Task & Validation Metric & Value & Notes \\
+\hline
+Search & success & 0.945 & sequential-only validation task: compact 3-qubit/8-state Grover-style lookup; paper mode woul... \\
+Entity Matching & similarity & 0.652 & Index-mode independent feature-vector task; swap-test estimate compared with classical square... \\
+Keyword Search & top\_score & 0.497 & top result = Aristotle; small running-example keyword-search validation \\
+Link Prediction & distance & 0.028 & TransE-style e\_h + r versus e\_t distance-estimation validation using amplitude encoding and a... \\
+Multi-hop Reasoning & phase error & 0 & Two-hop phase accumulation with controlled phase operations; not a full RDFS reasoner. \\
+Schema Matching & Fourier similarity & 0.991 & Toy schema-pattern validation using QFT magnitude signatures; not full schema matching. \\
+\hline
+\end{tabular}
+\end{table}
